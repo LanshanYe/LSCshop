@@ -1,70 +1,36 @@
 <template>
-  <query ref="querycomponent" :list-query="listQuery">
+  <query ref="querycomponent" :list-query="listQuery" :api="api">
     <div slot="queryFilter">
-      <el-input :placeholder="$t('table.bookname')" v-model="listQuery.title" size="small" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-input :placeholder="$t('table.press')" v-model="listQuery.name" size="small" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-input :placeholder="$t('table.borrower')" v-model="listQuery.title2" size="small" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-input :placeholder="$t('table.phone')" v-model="listQuery.title3" size="small" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-select v-model="listQuery.importance" :placeholder="$t('table.settleState')" class="filter-item" size="small" clearable>
+      <el-input :placeholder="$t('table.bookname')" v-model="listQuery.book_title" size="small" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input :placeholder="$t('table.press')" v-model="listQuery.book_press" size="small" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input :placeholder="$t('table.borrower')" v-model="listQuery.user_name" size="small" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input :placeholder="$t('table.phone')" v-model="listQuery.phone" size="small" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-select v-model="listQuery.status" :placeholder="$t('table.settleState')" class="filter-item" size="small" clearable>
         <el-option v-for="item in settledata" :key="item.value" :label="item.label" :value="item.value"/>
       </el-select>
       <el-date-picker
         v-model="value4"
         class="filter-item"
         size="small"
-        type="datetimerange"
+        type="daterange"
+        value-format="yyyy-MM-dd HH:mm:ss"
         range-separator="至"
         start-placeholder="开始日期"
-        end-placeholder="结束日期"/>
+        end-placeholder="结束日期"
+        @change="timechange"/>
       <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
     </div>
     <el-table-column slot="tableColumn" :label="$t('table.id')" type="index" align="center"/>
-    <el-table-column slot="tableColumn" :label="$t('table.bookname')" align="center">
+    <el-table-column slot="tableColumn" :label="$t('table.bookname')" align="center" prop="book_title"/>
+    <el-table-column slot="tableColumn" :label="$t('table.press')" align="center" prop="book_press"/>
+    <el-table-column slot="tableColumn" :label="$t('table.price')" align="center" prop="book_price"/>
+    <el-table-column slot="tableColumn" :label="$t('table.borrower')" align="center" prop="user_name"/>
+    <el-table-column slot="tableColumn" :label="$t('table.readCard')" align="center" prop="reader_card_number"/>
+    <el-table-column slot="tableColumn" :label="$t('table.phone')" align="center" prop="phone"/>
+    <el-table-column slot="tableColumn" :label="$t('table.borrowDate')" align="center" prop="created_at"/>
+    <el-table-column slot="tableColumn" :label="$t('table.settleState')" align="center" prop="status">
       <template slot-scope="scope">
-        <span>{{ scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
-      </template>
-    </el-table-column>
-    <el-table-column slot="tableColumn" :label="$t('table.press')">
-      <template slot-scope="scope">
-        <span class="link-type" @click="handleUpdate(scope.row)">{{ scope.row.title }}</span>
-        <el-tag>{{ scope.row.type | typeFilter }}</el-tag>
-      </template>
-    </el-table-column>
-    <el-table-column slot="tableColumn" :label="$t('table.price')" align="center">
-      <template slot-scope="scope">
-        <span>{{ scope.row.author }}</span>
-      </template>
-    </el-table-column>
-    <el-table-column slot="tableColumn" :label="$t('table.borrower')" align="center">
-      <template slot-scope="scope">
-        <span>{{ scope.row.author }}</span>
-      </template>
-    </el-table-column>
-    <el-table-column slot="tableColumn" :label="$t('table.readCard')" align="center">
-      <template slot-scope="scope">
-        <el-button type="primary">{{ $t('table.registration') }}</el-button>
-      </template>
-    </el-table-column>
-    <el-table-column slot="tableColumn" :label="$t('table.phone')" align="center">
-      <template slot-scope="scope">
-        <el-button type="primary">{{ $t('table.registration') }}</el-button>
-      </template>
-    </el-table-column>
-    <el-table-column slot="tableColumn" :label="$t('table.borrowDate')" align="center">
-      <template slot-scope="scope">
-        <el-button type="primary">{{ $t('table.registration') }}</el-button>
-      </template>
-    </el-table-column>
-    <el-table-column slot="tableColumn" :label="$t('table.settleState')" align="center">
-      <template slot-scope="scope">
-        <el-button type="primary">{{ $t('table.registration') }}</el-button>
-      </template>
-    </el-table-column>
-    <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
-      <template slot-scope="scope">
-        <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-        <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">{{ $t('table.delete') }}
-        </el-button>
+        <el-tag :type="scope.row.status===1?'success':'danger'">{{ scope.row.status===1?'已结算':'未结算' }}</el-tag>
       </template>
     </el-table-column>
   </query>
@@ -74,19 +40,6 @@
 import query from '@/components/queryTable'
 import waves from '@/directive/waves' // 水波纹指令
 
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
-
-// arr to obj ,such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
-
 export default {
   name: 'Clipboard',
   directives: {
@@ -94,19 +47,6 @@ export default {
   },
   components: {
     query
-  },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
-    }
   },
   data() {
     return {
@@ -118,6 +58,9 @@ export default {
         { label: '已结算', value: 1 },
         { label: '未结算', value: 2 }
       ],
+      api: {
+        fetch: '/purchase'
+      },
       listLoading: true,
       listQuery: {
         page: 1,
@@ -127,7 +70,6 @@ export default {
         type: undefined,
         sort: '+id'
       },
-      calendarTypeOptions,
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
@@ -155,9 +97,12 @@ export default {
       downloadLoading: false
     }
   },
+  mounted() {
+    this.$refs.querycomponent.getList()
+  },
   methods: {
     handleModifyStatus(row, status) {
-      this.$refs.querycomponent.handleModifyStatus(row, status)
+      this.$refs.querycomponent.deleteData(row, status)
     },
     handleFilter() {
       this.$refs.querycomponent.handleFilter()
@@ -182,6 +127,15 @@ export default {
     },
     handleDownload() {
       this.$refs.querycomponent.handleDownload()
+    },
+    timechange(d) {
+      if (d) {
+        this.listQuery.purchase_time_start = d[0]
+        this.listQuery.purchase_time_end = d[1]
+      } else {
+        this.listQuery.purchase_time_start = ''
+        this.listQuery.purchase_time_end = ''
+      }
     }
   }
 }

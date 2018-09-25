@@ -1,54 +1,322 @@
-<!--
-    Administrator
-    2018/9/14 17:05
- -->
 <template>
-  <div class="app-container">
-    <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="120px" style="width: 100%;">
-      <el-form-item :label="$t('table.opentime')">
-        <el-date-picker
-          v-model="value4"
-          class="filter-item"
-          size="small"
-          type="datetimerange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"/>
-      </el-form-item>
-      <el-form-item label="LOGO">
-        <el-upload
-          :auto-upload="false"
-          action="https://jsonplaceholder.typicode.com/posts/"
-          list-type="picture-card">
-          <i class="el-icon-plus"/>
-        </el-upload>
-      </el-form-item>
-      <el-form-item :label="$t('table.copyright')">
-        <el-input v-model="temp.title" type="text"/>
-      </el-form-item>
-      <el-form-item :label="$t('table.nameOfLink')">
-        <el-input v-model="temp.title" type="text"/>
-      </el-form-item>
-      <el-form-item :label="$t('table.linkWebsite')">
-        <el-input v-model="temp.title" type="text"/>
-      </el-form-item>
-    </el-form>
+  <div>
+    <div v-show="!dialogFormVisible">
+      <query ref="querycomponent" :list-query="listQuery" :api="api">
+        <div slot="queryFilter">
+          <el-select v-model="listQuery.group" clearable class="filter-item" size="small" placeholder="请选择配置分类">
+            <el-option v-for="(it,index) in groupdata" :key="index" :label="it.label" :value="it.value"/>
+          </el-select>
+          <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
+          <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+        </div>
+        <el-table-column slot="tableColumn" :label="$t('table.showName')" prop="display_name" align="center"/>
+        <el-table-column slot="tableColumn" :label="$t('table.configdescript')" prop="value" align="center">
+          <template slot-scope="scope">
+            <div style="max-height: 150px" v-html="scope.row.value"/>
+          </template>
+        </el-table-column>
+        <el-table-column slot="tableColumn" :label="$t('table.configkind')" prop="group" align="center"/>
+        <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="110" class-name="small-padding fixed-width">
+          <template slot-scope="scope">
+            <el-button type="primary" size="mini" @click="handleUpdate(scope.row.id)">{{ $t('table.edit') }}</el-button>
+          </template>
+        </el-table-column>
+      </query>
+    </div>
+    <div v-show="dialogFormVisible" class="app-container">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="80px" style="width: 100%;">
+        <el-form-item :label="$t('table.configkind')">
+          <el-radio-group v-model="temp.group">
+            <el-radio v-for="(it,index) in groupdata" :label="it.value" :key="index" border>{{ it.label }}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item :label="$t('table.configname')">
+          <el-input v-model="temp.key" type="text"/>
+        </el-form-item>
+        <el-form-item :label="$t('table.showName')">
+          <el-input v-model="temp.display_name" type="text"/>
+        </el-form-item>
+        <el-form-item :label="$t('table.configtype')">
+          <el-radio-group v-model="temp.type" @change="getdata">
+            <el-radio v-for="(it,index) in typedata" :label="it.value" :key="index" border>{{ it.label }}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item :label="$t('table.configdescript')">
+          <el-input v-show="temp.type==='text'" v-model="temp.value" type="text"/>
+          <tinymce v-show="temp.type==='rich_text'" ref="tiny" :height="400" v-model="temp.value"/>
+          <uploadimg v-show="temp.type==='image'" :imglist="imglist" @getimg="getImgurl"/>
+        </el-form-item>
+      </el-form>
+      <div class="filter-container">
+        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
+        <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import query from '@/components/queryTable'
+import Tinymce from '@/components/Tinymce'
+import uploadimg from '@/components/Upload/uploadImg'
+import waves from '@/directive/waves' // 水波纹指令
+
 export default {
   name: 'SystemSetup',
+  directives: {
+    waves
+  },
+  components: {
+    query,
+    uploadimg,
+    Tinymce
+  },
   data() {
     return {
+      tableKey: 0,
+      list: null,
+      api: {
+        add: '/setting',
+        edit: '/setting',
+        fetch: '/setting',
+        info: '/setting',
+        delete: '/setting'
+      },
+      total: null,
       value4: '',
-      temp: {},
-      rules: {}
+      typedata: [
+        { value: 'text', label: '文字' },
+        { value: 'image', label: '图片' },
+        { value: 'rich_text', label: '富文本' }
+      ],
+      listLoading: true,
+      listQuery: {
+        page: 1
+      },
+      statusOptions: ['published', 'draft', 'deleted'],
+      showReviewer: false,
+      temp: {
+        type: 'text'
+      },
+      groupdata: [
+        { value: 'Index', label: '首页' },
+        { value: 'Donate', label: '捐赠' },
+        { value: 'About', label: '关于我们' },
+        { value: 'Admin', label: '后台' },
+        { value: 'Other', label: '其他' }
+      ],
+      dialogFormVisible: false,
+      dialogStatus: '',
+      textMap: {
+        update: '修改',
+        create: '新增'
+      },
+      imglist: [],
+      dialogPvVisible: false,
+      pvData: [],
+      rules: {
+        type: [{ required: true, message: 'type is required', trigger: 'change' }],
+        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
+        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+      },
+      downloadLoading: false
+    }
+  },
+  mounted() {
+    this.$refs.querycomponent.getList()
+  },
+  methods: {
+    deleteData(id) {
+      this.$confirm('您确定删除所选项?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$r.delete(this.api.delete + '/' + id).then((re) => {
+          if (re.data.status === 'success') {
+            this.$refs.querycomponent.getList()
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          } else {
+            this.$notify.error({
+              title: '失败',
+              message: '删除失败'
+            })
+          }
+        }).catch(errs => console.log(errs))
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+    handleFilter() {
+      this.$refs.querycomponent.handleFilter()
+    },
+    resetTemp() {
+      this.temp = {
+        type: 'text'
+      }
+    },
+    handleCreate() {
+      this.resetTemp()
+      this.$refs.tiny.setContent('')
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    createData() {
+      console.log(this.api.add, this.temp)
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          if (this.temp.type === 'image') {
+            var formData = new FormData()
+            for (var j in this.temp) {
+              formData.append(j, this.temp[j])
+            }
+            const config = {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            }
+            this.$r.post(this.api.add, formData, config).then((re) => {
+              console.log(re)
+              if (re.data.status === 'success') {
+                this.dialogFormVisible = false
+                this.$refs.querycomponent.getList()
+                this.$notify({
+                  title: '成功',
+                  message: '创建成功',
+                  type: 'success',
+                  duration: 2000
+                })
+              } else {
+                this.$notify.error({
+                  title: '失败',
+                  message: re.data.msg,
+                  duration: 2000
+                })
+              }
+            }).catch(errs => { console.log(errs) })
+          } else {
+            this.$r.post(this.api.add, this.temp).then((re) => {
+              if (re.data.status === 'success') {
+                this.$refs.querycomponent.getList()
+                this.dialogFormVisible = false
+                this.$notify({
+                  title: '成功',
+                  message: '创建成功',
+                  type: 'success',
+                  duration: 2000
+                })
+              } else {
+                this.$notify.error({
+                  title: '失败',
+                  message: re.data.msg,
+                  duration: 2000
+                })
+              }
+            }).catch(errs => { console.log(errs) })
+          }
+        }
+      })
+    },
+    handleUpdate(row) {
+      this.$r.get(this.api.info + '/' + row).then(re => {
+        this.dialogStatus = 'update'
+        this.temp = re.data.result
+        if (re.data.result.type === 'rich_text') {
+          this.$refs.tiny.setContent(re.data.result.value)
+        } else if (re.data.result.type === 'image') {
+          this.imglist = [{ name: re.data.result.display_name, url: re.data.result.value }]
+        }
+        this.dialogFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].clearValidate()
+        })
+      }).catch(errs => console.log(errs))
+    },
+    updateData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          if (this.temp.type === 'image') {
+            var formData = new FormData()
+            for (var j in this.temp) {
+              formData.append(j, this.temp[j])
+            }
+            const config = {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            }
+            this.$r.post(this.api.edit, formData, config).then((re) => {
+              console.log(re)
+              if (re.data.status === 'success') {
+                this.dialogFormVisible = false
+                this.$refs.querycomponent.getList()
+                this.$notify({
+                  title: '成功',
+                  message: '创建成功',
+                  type: 'success',
+                  duration: 2000
+                })
+              } else {
+                this.$notify.error({
+                  title: '失败',
+                  message: re.data.msg,
+                  duration: 2000
+                })
+              }
+            }).catch(errs => { console.log(errs) })
+          } else {
+            var tempData = Object.assign({}, this.temp)
+            this.$r.post(this.api.edit, tempData).then((re) => {
+              console.log(re)
+              if (re.data.status === 'success') {
+                this.dialogFormVisible = false
+                this.$refs.querycomponent.getList()
+                this.$notify({
+                  title: '成功',
+                  message: '更新成功',
+                  type: 'success',
+                  duration: 2000
+                })
+              } else {
+                this.$notify.error({
+                  title: '失败',
+                  message: re.data.msg,
+                  duration: 2000
+                })
+              }
+            }).catch(errs => { console.log(errs) })
+          }
+        }
+      })
+    },
+    typechange(d) {
+      console.log(d)
+      this.$refs.querycomponent.getList(1)
+    },
+    handleDelete(row) {
+      this.$refs.querycomponent.handleDelete(row)
+    },
+    handleDownload() {
+      this.$refs.querycomponent.handleDownload()
+    },
+    getdata(d) {
+      console.log(d)
+    },
+    getImgurl(d) {
+      this.temp.image = d
     }
   }
 }
 </script>
 
-<style>
+<style rel="stylesheet/scss" lang="scss" scoped>
 
 </style>

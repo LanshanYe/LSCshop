@@ -5,7 +5,7 @@
       <slot name="queryCount"/>
     </div>
 
-    <div class="filter-container">
+    <div class="queryFilters">
       <slot name="queryFilter"/>
     </div>
 
@@ -24,25 +24,6 @@
     <div class="pagination-container">
       <el-pagination v-show="total>0" :current-page="listQuery.page" :page-sizes="[10,20,30, 50]" :page-size="listQuery.limit" :total="total" background layout="total, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
-
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :width="dialogWidth">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="80px" style="width: 100%;">
-        <slot name="dataForms"/>
-        <!--<el-form-item :label="$t('table.realname')">-->
-        <!--<el-select v-model="temp.status" class="filter-item" placeholder="Please select">-->
-        <!--<el-option v-for="item in statusOptions" :key="item" :label="item" :value="item"/>-->
-        <!--</el-select>-->
-        <!--</el-form-item>-->
-        <!--<el-form-item :label="$t('table.importance')">-->
-        <!--<el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;"/>-->
-        <!--</el-form-item>-->
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
-        <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
-      </div>
-    </el-dialog>
 
   </div>
 </template>
@@ -90,7 +71,7 @@ export default {
       total: null,
       imageUrl: '',
       value4: '',
-      listLoading: true,
+      listLoading: false,
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
@@ -118,12 +99,13 @@ export default {
       downloadLoading: false
     }
   },
-  created() {
-    this.getList()
-  },
   methods: {
-    getList() {
+    getList(n) {
+      console.log('query')
       this.listLoading = true
+      if (n) {
+        this.listQuery.page = n
+      }
       fetchList(this.api.fetch, this.listQuery).then(response => {
         console.log(response)
         this.list = response.data.result.data
@@ -181,18 +163,7 @@ export default {
       })
     },
     handleUpdate(id) {
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-      // this.temp = Object.assign({}, row) // copy obj
-      // this.temp.timestamp = new Date(this.temp.timestamp)
-      // this.dialogStatus = 'update'
-      // this.dialogFormVisible = true
-      // this.$nextTick(() => {
-      //   this.$refs['dataForm'].clearValidate()
-      // })
+      console.log(id)
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
@@ -224,13 +195,21 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteData(this.api.delete, id).then(() => {
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
-          })
+        deleteData(this.api.delete + '/' + id).then((re) => {
+          if (re.data.status === 'success') {
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+            this.getList()
+          } else {
+            this.$message.error({
+              title: '失败',
+              message: re.data.msg || '删除失败'
+            })
+          }
         })
       }).catch(() => {
         this.$message({

@@ -17,10 +17,9 @@
         @change="timechange"/>
       <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
     </div>
-    <el-table-column slot="tableColumn" :label="$t('table.nickname')" prop="RDNAME" align="center"/>
+    <el-table-column slot="tableColumn" :label="$t('table.name')" prop="RDNAME" align="center"/>
     <el-table-column slot="tableColumn" :label="$t('table.phone')" prop="PHONE" align="center"/>
     <el-table-column slot="tableColumn" :label="$t('table.readCard')" prop="RDID" align="center"/>
-    <el-table-column slot="tableColumn" :label="$t('table.createTime')" prop="RDSTARTDATE" align="center"/>
     <el-table-column slot="tableColumn" :label="$t('table.endTime')" prop="RDENDDATE" align="center"/>
     <el-table-column slot="tableColumn" :label="$t('table.status')" :formatter="state" prop="RDCFSTATE" align="center"/>
   </query>
@@ -45,7 +44,7 @@ export default {
       total: null,
       imageUrl: '',
       api: {
-        fetch: '/users_reader_card',
+        fetch: 'users',
         info: 'users'
       },
       statusdata: [
@@ -58,10 +57,25 @@ export default {
       ],
       value4: '',
       listLoading: true,
-      listQuery: {},
+      listQuery: {
+        page: 1,
+        rows: 10,
+        RDCFSTATE: '',
+        STARDATE: '',
+        ENDDATE: '',
+        specialType: ''
+      },
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
-      temp: {},
+      temp: {
+        id: undefined,
+        importance: 1,
+        remark: '',
+        timestamp: new Date(),
+        title: '',
+        type: '',
+        status: 'published'
+      },
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {

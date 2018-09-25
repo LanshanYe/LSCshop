@@ -3,6 +3,9 @@
     <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container"/>
 
     <breadcrumb class="breadcrumb-container"/>
+    <div class="right-menu" style="margin-right: 30px;">
+      {{ name }}
+    </div>
     <div class="right-menu">
       <template v-if="device!=='mobile'">
         <error-log class="errLog-container right-menu-item"/>
@@ -15,7 +18,7 @@
         </el-tooltip>
       </template>
 
-      <el-dropdown class="avatar-container right-menu-item" trigger="click">
+      <el-dropdown class="avatar-container right-menu-item" placement="bottom">
         <div class="avatar-wrapper">
           <img v-if="avatar" :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
           <svg-icon v-else icon-class="user" class="user-avatar" />
@@ -146,7 +149,6 @@ export default {
     }
     .avatar-container {
       height: 50px;
-      margin-right: 30px;
       .avatar-wrapper {
         cursor: pointer;
         margin-top: 5px;

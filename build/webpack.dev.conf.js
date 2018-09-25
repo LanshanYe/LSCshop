@@ -57,7 +57,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       template: 'index.html',
       inject: true,
       favicon: resolve('favicon.ico'),
-      title: 'vue-element-admin',
+      title: '桃源县智慧图书馆管理系统',
       path: config.dev.assetsPublicPath + config.dev.assetsSubDirectory
     })
   ]

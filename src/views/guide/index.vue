@@ -1,77 +1,64 @@
 <template>
-  <query ref="querycomponent" :list-query="listQuery">
-    <div slot="queryFilter">
-      <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
-      <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-edit">导入爱心捐赠单</el-button>
+  <div class="app-container">
+    <div v-show="dialogFormVisible">
+      <div class="filter-container">
+        <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-upload">上传爱心捐赠单</el-button>
+      </div>
+      <el-table
+        v-loading="listLoading"
+        :key="tableKey"
+        :data="list"
+        border
+        stripe
+        fit
+        highlight-current-row
+        style="width: 100%;">
+        <slot name="tableColumn"/>
+        <el-table-column :label="$t('table.docName')" width="200px" align="center" prop="display_name"/>
+        <el-table-column :label="$t('table.docContent')" align="center" prop="value">
+          <template slot-scope="scope">
+            <el-tooltip :disabled="scope.row.value&&scope.row.value.length>200?false:true" popper-class="itemtip" effect="dark" placement="bottom">
+              <div slot="content">
+                <div v-html="scope.row.value"/>
+              </div>
+              <div v-html="scope.row.value&&scope.row.value.length > 200 ? scope.row.value.substr(0, 200) + '...' : scope.row.value"/>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
+          <template slot-scope="scope">
+            <el-button v-waves type="primary" size="mini" @click="view(scope.row.id)">{{ $t('table.edit') }}</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
-    <el-table-column slot="tableColumn" :label="$t('table.docType')" align="center">
-      <template slot-scope="scope">
-        <span>{{ scope.row.id }}</span>
-      </template>
-    </el-table-column>
-    <el-table-column slot="tableColumn" :label="$t('table.docContent')" align="center">
-      <template slot-scope="scope">
-        <el-button type="primary">{{ $t('table.registration') }}</el-button>
-      </template>
-    </el-table-column>
-    <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
-      <template slot-scope="scope">
-        <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-        <el-button size="mini" type="danger" @click="handleModifyStatus(scope.row,'deleted')">{{ $t('table.delete') }}
-        </el-button>
-      </template>
-    </el-table-column>
-    <div slot="dataForms">
-      <el-form-item :label="$t('table.docType')" prop="timestamp">
-        <el-select v-model="listQuery.importance" :placeholder="$t('table.status')" size="small" clearable style="width: 90px" class="filter-item">
-          <el-option v-for="item in typedata" :key="item.value" :label="item.label" :value="item.value"/>
-        </el-select>
-      </el-form-item>
-      <el-form-item :label="$t('table.docContent')" prop="timestamp">
-        <el-input v-model="temp.name" type="textarea"/>
-      </el-form-item>
+    <div v-show="!dialogFormVisible">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="80px" style="width: 100%;">
+        <el-form-item :label="$t('table.docName')">
+          <el-input v-model="temp.display_name" type="text" size="small" clearable/>
+        </el-form-item>
+        <el-form-item :label="$t('table.docContent')">
+          <tinymce ref="tiny" :height="400" v-model="temp.value"/>
+        </el-form-item>
+      </el-form>
+      <div class="filter-container">
+        <el-button @click="dialogFormVisible = true">{{ $t('table.cancel') }}</el-button>
+        <el-button type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
+      </div>
     </div>
-  </query>
+  </div>
 </template>
 
 <script>
-import query from '@/components/queryTable'
+import Tinymce from '@/components/Tinymce'
 import waves from '@/directive/waves' // 水波纹指令
-
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
-
-// arr to obj ,such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
 
 export default {
   name: 'Guide',
   directives: {
     waves
   },
-  components: {
-    query
-  },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
-    }
-  },
+  components: { Tinymce },
   data() {
     return {
       tableKey: 0,
@@ -86,26 +73,17 @@ export default {
       ],
       listLoading: true,
       listQuery: {
-        page: 1,
-        limit: 10,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        sort: '+id'
+        page: 1
       },
-      calendarTypeOptions,
+      api: {
+        fetch: '/donate-settings',
+        info: '/donate-setting',
+        edit: '/donate-setting'
+      },
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
-      temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
-      },
-      dialogFormVisible: false,
+      temp: {},
+      dialogFormVisible: true,
       dialogStatus: '',
       textMap: {
         update: '修改',
@@ -121,7 +99,20 @@ export default {
       downloadLoading: false
     }
   },
+  mounted() {
+    this.getList()
+  },
   methods: {
+    getList() {
+      this.listLoading = true
+      this.$r.get(this.api.fetch, this.listQuery).then(response => {
+        console.log(response)
+        this.list = response.data.result
+
+        // Just to simulate the time of the request
+        this.listLoading = false
+      })
+    },
     handleModifyStatus(row, status) {
       this.$refs.querycomponent.handleModifyStatus(row, status)
     },
@@ -129,30 +120,86 @@ export default {
       this.$refs.querycomponent.handleFilter()
     },
     resetTemp() {
-      this.$refs.querycomponent.resetTemp()
+      this.temp = {}
     },
     handleCreate() {
-      this.$refs.querycomponent.handleCreate()
+      this.resetTemp()
+      this.$refs.tiny.setContent('')
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
     },
     createData() {
-      this.$refs.querycomponent.createData()
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          this.$r.post(this.api.add, this.temp).then(() => {
+            this.dialogFormVisible = false
+            this.$notify({
+              title: '成功',
+              message: '创建成功',
+              type: 'success',
+              duration: 2000
+            })
+          }).catch(errs => { console.log(errs) })
+        }
+      })
+    },
+    updateData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, this.temp)
+          this.$r.put(this.api.edit + '/' + tempData.id, tempData).then((re) => {
+            console.log(re)
+            if (re.data.status === 'success') {
+              this.dialogFormVisible = true
+              this.getList()
+              this.$notify({
+                title: '成功',
+                message: '更新成功',
+                type: 'success',
+                duration: 2000
+              })
+            } else {
+              this.$notify.error({
+                title: '失败',
+                message: '修改失败',
+                duration: 2000
+              })
+            }
+          }).catch(errs => { console.log(errs) })
+        }
+      })
     },
     handleUpdate(row) {
       this.$refs.querycomponent.handleUpdate(row)
-    },
-    updateData() {
-      this.$refs.querycomponent.updateData()
     },
     handleDelete(row) {
       this.$refs.querycomponent.handleDelete(row)
     },
     handleDownload() {
       this.$refs.querycomponent.handleDownload()
+    },
+    view(d) {
+      this.$r.get(this.api.info + '/' + d).then(re => {
+        console.log(re)
+        if (re.data.status === 'success') {
+          this.dialogFormVisible = false
+          this.temp = re.data.result
+          this.$refs.tiny.setContent(re.data.result.value)
+        } else {
+          this.$notify.error({
+            title: '失败',
+            message: '获取失败',
+            duration: 2000
+          })
+        }
+      }).catch(errs => { console.log(errs) })
     }
   }
 }
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-
 </style>

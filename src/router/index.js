@@ -129,23 +129,31 @@ export const asyncRouterMap = [
         name: 'Documentation',
         zhname: '借书管理',
         promiss: 'readManage-borrow',
-        meta: { title: 'borrowBook', icon: 'documentation', noCache: true, roles: ['admin', 'readManage-borrow'] }
+        meta: { title: 'borrowBook', icon: 'documentation', roles: ['admin', 'readManage-borrow'] }
       },
       {
-        path: 'Rcard', // 读者证管理
+        path: 'Rcard', // 读者列表
         component: () => import('@/views/documentation/Rcard'),
         name: 'Rcard',
-        zhname: '读者证管理',
+        zhname: '读者列表',
         promiss: 'readManage-card',
-        meta: { title: 'rcard', icon: 'documentation', noCache: true, roles: ['admin', 'readManage-card'] }
+        meta: { title: 'rcard', icon: 'documentation', roles: ['admin', 'readManage-card'] }
       },
+      // {
+      //   path: 'readerManage', // 读者管理
+      //   component: () => import('@/views/documentation/Rcard'),
+      //   name: 'readerManage',
+      //   zhname: '读者管理',
+      //   promiss: 'readManage-readerManage',
+      //   meta: { title: 'readerManage', icon: 'documentation', roles: ['admin', 'readManage-readerManage'] }
+      // },
       {
         path: 'Ractive', // 活动管理
         component: () => import('@/views/documentation/Ractive'),
         name: 'Ractive',
         zhname: '活动管理',
         promiss: 'readManage-active',
-        meta: { title: 'ractive', icon: 'documentation', noCache: true, roles: ['admin', 'readManage-active'] }
+        meta: { title: 'ractive', icon: 'documentation', roles: ['admin', 'readManage-active'] }
       }
     ]
   },
@@ -156,7 +164,7 @@ export const asyncRouterMap = [
     zhname: '捐赠管理',
     promiss: 'donationManage',
     meta: {
-      title: 'guide', icon: 'guide', noCache: true,
+      title: 'guide', icon: 'guide',
       roles: ['admin', 'donationManage'] // you can set roles in root nav
     },
     children: [
@@ -191,17 +199,32 @@ export const asyncRouterMap = [
     component: Layout,
     zhname: '资讯管理',
     promiss: 'infoManage',
-    meta: { roles: ['admin', 'infoManage'] },
+    meta: { title: 'icons', icon: 'icon', roles: ['admin', 'infoManage'] },
     children: [
       {
         path: 'index',
         component: () => import('@/views/infoManage/infoManage'),
         name: 'InfoManage',
-        meta: { title: 'icons', icon: 'icon', noCache: true }
+        meta: { title: 'icons', icon: 'icon', roles: ['admin', 'infoManage'] }
       }
     ]
   },
 
+  {
+    path: '/tab', // 服务指南
+    component: Layout,
+    zhname: '服务指南',
+    promiss: 'service',
+    meta: { title: 'serviceList', icon: 'tab', roles: ['admin', 'service'] },
+    children: [
+      {
+        path: 'serviceList', // 服务指南
+        component: () => import('@/views/tab/serviceList'),
+        name: 'ServiceList',
+        meta: { title: 'serviceList', icon: 'tab', roles: ['admin', 'service'] }
+      }
+    ]
+  },
   /** When your routing table is too long, you can split it into small modules**/
   //  componentsRouter,
   //  chartsRouter,
@@ -239,32 +262,6 @@ export const asyncRouterMap = [
   //     }
   //   ]
   // },
-
-  {
-    path: '/tab', // 服务指南
-    component: Layout,
-    zhname: '服务指南',
-    promiss: 'service',
-    meta: { title: 'tab', icon: 'tab', roles: ['admin', 'service'] },
-    children: [
-      {
-        path: 'index', // 阅读推广服务管理
-        component: () => import('@/views/tab/index'),
-        name: 'Tab',
-        promiss: 'service-promotion',
-        zhname: '阅读推广服务管理',
-        meta: { title: 'ReadPromotion', icon: 'tab', roles: ['admin', 'service-promotion'] }
-      },
-      {
-        path: 'serviceList', // 服务列表
-        component: () => import('@/views/tab/serviceList'),
-        name: 'ServiceList',
-        zhname: '服务列表',
-        promiss: 'service-list',
-        meta: { title: 'serviceList', icon: 'tab', roles: ['admin', 'service-list'] }
-      }
-    ]
-  },
 
   // {
   //   path: '/error',
@@ -379,7 +376,7 @@ export const asyncRouterMap = [
         path: 'index',
         component: () => import('@/views/systemSetup/index'),
         name: 'SystemSetup',
-        meta: { title: 'systemSetup', icon: 'clipboard' }
+        meta: { title: 'systemSetup', icon: 'clipboard', roles: ['admin', 'systemSetup'] }
       }
     ]
   },
@@ -392,12 +389,12 @@ export const asyncRouterMap = [
     meta: { title: 'i18n', icon: 'international', roles: ['admin', 'adminManage'] },
     children: [
       {
-        path: 'addAdmin', // 新增管理角色
+        path: 'addAdmin', // 角色管理
         component: () => import('@/views/i18n-demo/addAdmin'),
         name: 'AddAdmin',
-        zhname: '新增管理角色',
+        zhname: '角色管理',
         promiss: 'adminManage-addAdmin',
-        meta: { title: 'addAdmin', icon: 'international', noCache: true, roles: ['admin', 'adminManage-addAdmin'] }
+        meta: { title: 'addAdmin', icon: 'international', roles: ['admin', 'adminManage-addAdmin'] }
       },
       {
         path: 'index', // 管理员管理
@@ -405,7 +402,7 @@ export const asyncRouterMap = [
         name: 'I18n',
         zhname: '管理员管理',
         promiss: 'adminManage-index',
-        meta: { title: 'i18n', icon: 'international', roles: ['admin', 'adminManage-index'] }
+        meta: { title: 'i18n', icon: 'international', noCache: true, roles: ['admin', 'adminManage-index'] }
       },
       {
         path: 'adminLog', // 管理员日志
@@ -430,7 +427,7 @@ export const asyncRouterMap = [
         path: 'index',
         component: () => import('@/views/clipboard/index'),
         name: 'ClipboardDemo',
-        meta: { title: 'clipboardDemo', icon: 'clipboard' }
+        meta: { title: 'clipboardDemo', icon: 'clipboard', roles: ['admin', 'ureadManage'] }
       }
     ]
   },

@@ -1,31 +1,31 @@
 <template>
   <query ref="querycomponent" :list-query="listQuery" :api="api">
     <div slot="queryFilter">
-      <el-input :placeholder="$t('table.name')" v-model="listQuery.NAME" size="small" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-input :placeholder="$t('table.bookname')" v-model="listQuery.TITLE" size="small" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-select v-model="listQuery.TYPENAME" :placeholder="$t('table.status')" size="small" clearable style="width: 90px" class="filter-item">
-        <el-option v-for="item in statusdata" :key="item.value" :label="item.label" :value="item.label"/>
+      <el-input :placeholder="$t('table.readCard')" v-model="listQuery.rdid" size="small" style="width: 200px;" class="filter-item" clearable @keyup.enter.native="handleFilter"/>
+      <el-select v-model="listQuery.typename" :placeholder="$t('table.status')" size="small" clearable style="width: 90px" class="filter-item">
+        <el-option v-for="(item,index) in statusdata" :key="index" :label="item" :value="item"/>
       </el-select>
       <el-date-picker
-        v-model="listQuery.REGTIME"
+        v-model="value4"
         class="filter-item"
         size="small"
-        type="date"
-        placeholder="选择日期"
-        value-format="yyyy-MM-dd"/>
+        type="datetimerange"
+        range-separator="至"
+        value-format="yyyy-MM-dd HH:mm:ss"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        @change="timechange"/>
       <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
     </div>
     <el-table-column slot="tableColumn" :label="$t('table.readCard')" prop="DATA2" align="center"/>
     <el-table-column slot="tableColumn" :label="$t('table.bookname')" prop="TITLE" align="center"/>
     <el-table-column slot="tableColumn" :label="$t('table.time')" prop="REGTIME" align="center"/>
     <el-table-column slot="tableColumn" :label="$t('table.status')" prop="TYPENAME" align="center"/>
-    <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
-      <template slot-scope="scope">
-        <el-button type="primary" size="mini" @click="handleUpdate(scope.row.DATA2)">{{ $t('table.edit') }}</el-button>
-        <el-button size="mini" type="danger" @click="deleteData(scope.row.DATA2)">{{ $t('table.delete') }}
-        </el-button>
-      </template>
-    </el-table-column>
+    <template slot="dataForms">
+      <el-form-item :label="$t('table.title')">
+        <el-input v-model="temp.title" type="text"/>
+      </el-form-item>
+    </template>
   </query>
 </template>
 
@@ -51,35 +51,15 @@ export default {
         fetch: 'userborrow',
         info: 'userborrow'
       },
-      statusdata: [
-        { label: '预约', value: 1 },
-        { label: '在借', value: 2 },
-        { label: '续借', value: 3 },
-        { label: '已还', value: 4 },
-        { label: '逾期', value: 5 }
-      ],
+      statusdata: ['借书', '还书', '续借'],
       value4: '',
       listLoading: true,
       listQuery: {
-        page: 1,
-        rdid: '123',
-        rows: 10,
-        rdidl: '',
-        startDate: '',
-        endDate: '',
-        typename: ''
+        rows: 10
       },
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
-      temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
-      },
+      temp: {},
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -95,6 +75,9 @@ export default {
       },
       downloadLoading: false
     }
+  },
+  mounted() {
+    this.$refs.querycomponent.getList()
   },
   methods: {
     deleteData(status) {
@@ -113,6 +96,9 @@ export default {
       this.$refs.querycomponent.createData()
     },
     handleUpdate(row) {
+      this.$r.get(this.api.info + '/' + row).then(re => {
+        console.log(re)
+      }).catch(errs => console.log(errs))
       this.$refs.querycomponent.handleUpdate(row)
     },
     updateData() {
@@ -123,6 +109,16 @@ export default {
     },
     handleDownload() {
       this.$refs.querycomponent.handleDownload()
+    },
+    timechange(d) {
+      console.log(d)
+      if (d) {
+        this.listQuery.startDate = d[0]
+        this.listQuery.endDate = d[1]
+      } else {
+        this.listQuery.startDate = ''
+        this.listQuery.endDate = ''
+      }
     }
   }
 }

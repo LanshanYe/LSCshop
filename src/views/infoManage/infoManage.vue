@@ -1,40 +1,56 @@
 <template>
-  <query ref="querycomponent" :list-query="listQuery" :api="queryapi">
-    <div slot="queryFilter">
-      <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+  <div>
+    <div v-show="!dialogFormVisible">
+      <query ref="querycomponent" :list-query="listQuery" :api="api">
+        <div slot="queryFilter">
+          <el-radio-group v-model="listQuery.type" size="small" class="filter-item" @change="typechange">
+            <el-radio-button :label="1">{{ $t('table.noticeNew') }}</el-radio-button>
+            <el-radio-button :label="2">{{ $t('table.infonews') }}</el-radio-button>
+          </el-radio-group>
+          <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+        </div>
+        <el-table-column slot="tableColumn" :label="$t('table.title')" prop="title" align="center"/>
+        <el-table-column slot="tableColumn" :label="$t('table.type')" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.type | filterType }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column slot="tableColumn" :label="$t('table.releaseDate')" prop="created_at" align="center"/>
+        <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
+          <template slot-scope="scope">
+            <el-button type="primary" size="mini" @click="handleUpdate(scope.row.notice_id)">{{ $t('table.edit') }}</el-button>
+            <el-button size="mini" type="danger" @click="deleteData(scope.row.notice_id)">{{ $t('table.delete') }}
+            </el-button>
+          </template>
+        </el-table-column>
+      </query>
     </div>
-    <el-table-column slot="tableColumn" :label="$t('table.title')" prop="title" align="center"/>
-    <el-table-column slot="tableColumn" :label="$t('table.type')" align="center">
-      <template slot-scope="scope">
-        <span>{{ scope.row.type | filterType }}</span>
-      </template>
-    </el-table-column>
-    <el-table-column slot="tableColumn" :label="$t('table.releaseDate')" prop="created_at" align="center"/>
-    <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
-      <template slot-scope="scope">
-        <el-button type="primary" size="mini" @click="handleUpdate(scope.row.notice_id)">{{ $t('table.edit') }}</el-button>
-        <el-button size="mini" type="danger" @click="deleteData(scope.row.notice_id)">{{ $t('table.delete') }}
-        </el-button>
-      </template>
-    </el-table-column>
-    <div slot="dataForms">
-      <el-form-item :label="$t('table.type')">
-        <el-select v-model="temp.importance" :placeholder="$t('table.status')" size="small" clearable>
-          <el-option v-for="item in typedata" :key="item.value" :label="item.label" :value="item.value"/>
-        </el-select>
-      </el-form-item>
-      <el-form-item :label="$t('table.title')">
-        <el-input v-model="temp.title" type="text"/>
-      </el-form-item>
-      <el-form-item :label="$t('table.content')">
-        <el-input v-model="temp.content" type="textarea"/>
-      </el-form-item>
+    <div v-show="dialogFormVisible" class="app-container">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="80px" style="width: 100%;">
+        <el-form-item :label="$t('table.type')">
+          <el-select v-model="temp.type" :placeholder="$t('table.status')" size="small" clearable>
+            <el-option v-for="item in typedata" :key="item.value" :label="item.label" :value="item.value"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="$t('table.title')">
+          <el-input v-model="temp.title" type="text"/>
+        </el-form-item>
+        <el-form-item :label="$t('table.content')">
+          <tinymce ref="tiny" :height="400" v-model="temp.content"/>
+        </el-form-item>
+      </el-form>
+      <div class="filter-container">
+        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
+        <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
+      </div>
     </div>
-  </query>
+  </div>
 </template>
 
 <script>
 import query from '@/components/queryTable'
+import Tinymce from '@/components/Tinymce'
 import waves from '@/directive/waves' // 水波纹指令
 const typedata = [
   { value: 1, label: '通知公告' },
@@ -47,17 +63,10 @@ export default {
     waves
   },
   components: {
-    query
+    query,
+    Tinymce
   },
   filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    },
     filterType(t) {
       return typedata[t - 1].label
     }
@@ -66,7 +75,7 @@ export default {
     return {
       tableKey: 0,
       list: null,
-      queryapi: {
+      api: {
         add: '/notice',
         edit: '/notice',
         fetch: '/notice',
@@ -79,19 +88,11 @@ export default {
       listLoading: true,
       listQuery: {
         page: 1,
-        type: 2
+        type: 1
       },
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
-      temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
-      },
+      temp: {},
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -108,27 +109,126 @@ export default {
       downloadLoading: false
     }
   },
+  mounted() {
+    this.$refs.querycomponent.getList()
+  },
   methods: {
     deleteData(id) {
-      this.$refs.querycomponent.deleteData(id)
+      this.$confirm('您确定删除所选项?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$r.delete(this.api.delete + '/' + id).then((re) => {
+          if (re.data.status === 'success') {
+            this.$refs.querycomponent.getList()
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          } else {
+            this.$notify.error({
+              title: '失败',
+              message: '删除失败'
+            })
+          }
+        }).catch(errs => console.log(errs))
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     },
     handleFilter() {
       this.$refs.querycomponent.handleFilter()
     },
     resetTemp() {
-      this.$refs.querycomponent.resetTemp()
+      this.temp = {}
     },
     handleCreate() {
-      this.$refs.querycomponent.handleCreate()
+      this.resetTemp()
+      this.$refs.tiny.setContent('')
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
     },
     createData() {
-      this.$refs.querycomponent.createData()
+      console.log(this.api.add, this.temp)
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          this.$r.post(this.api.add, this.temp).then((re) => {
+            if (re.data.status === 'success') {
+              this.$refs.querycomponent.getList()
+              this.dialogFormVisible = false
+              this.$notify({
+                title: '成功',
+                message: '创建成功',
+                type: 'success',
+                duration: 2000
+              })
+            } else {
+              this.$notify.error({
+                title: '失败',
+                message: '创建失败',
+                duration: 2000
+              })
+            }
+          }).catch(errs => { console.log(errs) })
+        }
+      })
     },
-    handleUpdate(id) {
-      this.$refs.querycomponent.handleUpdate(id)
+    handleUpdate(row) {
+      this.$r.get(this.api.info + '/' + row).then(re => {
+        if (re.data.status === 'success') {
+          this.dialogStatus = 'update'
+          this.temp = re.data.result
+          this.$refs.tiny.setContent(re.data.result.content)
+          this.dialogFormVisible = true
+          this.$nextTick(() => {
+            this.$refs['dataForm'].clearValidate()
+          })
+        } else {
+          this.$notify.error({
+            title: '失败',
+            message: re.data.msg
+          })
+        }
+      }).catch(errs => console.log(errs))
     },
     updateData() {
-      this.$refs.querycomponent.updateData()
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          var tempData = Object.assign({}, this.temp)
+          this.$r.put(this.api.edit + '/' + tempData.notice_id, tempData).then((re) => {
+            console.log(re)
+            if (re.data.status === 'success') {
+              this.dialogFormVisible = false
+              this.$refs.querycomponent.getList()
+              this.$notify({
+                title: '成功',
+                message: '更新成功',
+                type: 'success',
+                duration: 2000
+              })
+            } else {
+              this.$notify.error({
+                title: '失败',
+                message: '修改失败',
+                duration: 2000
+              })
+            }
+          }).catch(errs => { console.log(errs) })
+        }
+      })
+    },
+    typechange(d) {
+      console.log(d)
+      this.$refs.querycomponent.getList(1)
     },
     handleDelete(row) {
       this.$refs.querycomponent.handleDelete(row)
