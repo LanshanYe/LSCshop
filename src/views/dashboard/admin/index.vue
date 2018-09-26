@@ -18,7 +18,7 @@
       <!--<pie-chart/>-->
       <!--</div>-->
       <!--</el-col>-->
-      <el-col :xs="24" :sm="24" :lg="18">
+      <el-col :xs="24" :sm="24" :lg="24">
         <div class="chart-wrapper">
           <bar-chart :data="bardata"/>
         </div>
@@ -81,7 +81,9 @@ export default {
       })
       this.bardata = {
         titledata: arr,
-        datas: arr2
+        datas: arr2,
+        titles: '今日借出书籍排行榜',
+        color: '#40c9c6'
       }
     }).catch(errs => { console.log(errs) })
   },
@@ -98,7 +100,7 @@ export default {
         this.bardata = {
           titledata: arr,
           datas: arr2,
-          titles: '今日购借书籍排行榜',
+          titles: '今日借出书籍排行榜',
           color: '#40c9c6'
         }
       } else if (type === 'month') {
@@ -109,7 +111,7 @@ export default {
         this.bardata = {
           titledata: arr,
           datas: arr2,
-          titles: '本月购借书籍排行榜',
+          titles: '本月借出书籍排行榜',
           color: '#36a3f7'
         }
       } else if (type === 'year') {
@@ -120,7 +122,7 @@ export default {
         this.bardata = {
           titledata: arr,
           datas: arr2,
-          titles: '本年购借书籍排行榜',
+          titles: '本年借出书籍排行榜',
           color: '#f4516c'
         }
       }

@@ -8,14 +8,16 @@
           </el-select>
           <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
           <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+          <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-download" @click="downloadVideo">{{ $t('table.downloadVideo') }}</el-button>
         </div>
         <el-table-column slot="tableColumn" :label="$t('table.showName')" prop="display_name" align="center"/>
         <el-table-column slot="tableColumn" :label="$t('table.configdescript')" prop="value" align="center">
           <template slot-scope="scope">
-            <div style="max-height: 150px" v-html="scope.row.value"/>
+            <img v-if="scope.row.type === 'image'" :src="scope.row.value" alt="">
+            <div v-else style="width: 100%;max-height: 150px;overflow: auto" v-html="scope.row.value"/>
           </template>
         </el-table-column>
-        <el-table-column slot="tableColumn" :label="$t('table.configkind')" prop="group" align="center"/>
+        <el-table-column slot="tableColumn" :label="$t('table.configkind')" :formatter="configformat" prop="group" align="center"/>
         <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="110" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button type="primary" size="mini" @click="handleUpdate(scope.row.id)">{{ $t('table.edit') }}</el-button>
@@ -31,10 +33,10 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item :label="$t('table.configname')">
-          <el-input v-model="temp.key" type="text"/>
+          <el-input v-model="temp.key" type="text" placeholder="如：site.index"/>
         </el-form-item>
         <el-form-item :label="$t('table.showName')">
-          <el-input v-model="temp.display_name" type="text"/>
+          <el-input v-model="temp.display_name" placeholder="请填写四至十六个的汉字" type="text"/>
         </el-form-item>
         <el-form-item :label="$t('table.configtype')">
           <el-radio-group v-model="temp.type" @change="getdata">
@@ -229,12 +231,14 @@ export default {
     },
     handleUpdate(row) {
       this.$r.get(this.api.info + '/' + row).then(re => {
+        console.log(re)
         this.dialogStatus = 'update'
         this.temp = re.data.result
-        if (re.data.result.type === 'rich_text') {
-          this.$refs.tiny.setContent(re.data.result.value)
-        } else if (re.data.result.type === 'image') {
+        this.$refs.tiny.setContent(re.data.result.value || '')
+        if (re.data.result.type === 'image') {
           this.imglist = [{ name: re.data.result.display_name, url: re.data.result.value }]
+        } else {
+          this.imglist = []
         }
         this.dialogFormVisible = true
         this.$nextTick(() => {
@@ -312,6 +316,53 @@ export default {
     },
     getImgurl(d) {
       this.temp.image = d
+    },
+    downloadVideo() {
+      this.$confirm('您确定执行同步视频资源?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const loading = this.$loading({
+          lock: true,
+          text: '正在同步中。。。'
+        })
+        this.$r.get('/importvideo').then((re) => {
+          console.log(re)
+          if (re.data.status === 'success') {
+            this.$notify({
+              title: '成功',
+              message: re.data.msg || '同步成功',
+              type: 'success',
+              duration: 2000
+            })
+          } else {
+            this.$notify.error({
+              title: '失败',
+              message: re.data.msg || '同步失败'
+            })
+          }
+          loading.close()
+        }).catch(errs => {
+          console.log(errs)
+          loading.close()
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        })
+      })
+    },
+    configformat(v) {
+      var vl = v.group
+      for (var i = 0; i < this.groupdata.length; i++) {
+        if (this.groupdata[i].value === v.group) {
+          vl = this.groupdata[i].label
+          break
+        }
+      }
+      return vl
     }
   }
 }

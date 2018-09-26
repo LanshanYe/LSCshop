@@ -4,6 +4,7 @@
  -->
 <template>
   <el-upload
+    ref="imgup"
     :auto-upload="false"
     :on-change="getImgurl"
     :on-remove="handleRemove"
@@ -43,6 +44,9 @@ export default {
     },
     handleExceed() {
       this.$message.warning(`当前限制上传 1 个图片！`)
+    },
+    clearFile() {
+      this.$refs.imgup.clearFiles()
     }
   }
 }

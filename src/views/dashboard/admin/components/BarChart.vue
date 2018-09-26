@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%;height: 500px">
+  <div :style="{width: width, height: height}">
     <div :class="className"/>
   </div>
 </template>
@@ -23,7 +23,7 @@ export default {
     },
     height: {
       type: String,
-      default: '300px'
+      default: '500px'
     },
     data: {
       type: Object,
@@ -109,7 +109,7 @@ export default {
         },
         series: [{
           type: 'bar',
-          name: '图书购借本数',
+          name: '图书借出本数',
           barWidth: '60%',
           label: {
             show: true

@@ -4,7 +4,7 @@
       <query ref="querycomponent" key="query1" :list-query="listQuery" :api="api">
         <div slot="queryFilter">
           <el-input :placeholder="$t('table.theme')" v-model="listQuery.title" size="small" style="width: 200px;" class="filter-item" clearable @keyup.enter.native="handleFilter"/>
-          <el-input :placeholder="$t('table.address')" v-model="listQuery.activity_place" size="small" style="width: 200px;" class="filter-item" clearable @keyup.enter.native="handleFilter"/>
+          <!--<el-input :placeholder="$t('table.address')" v-model="listQuery.activity_place" size="small" style="width: 200px;" class="filter-item" clearable @keyup.enter.native="handleFilter"/>-->
           <el-input :placeholder="$t('table.hostUnit')" v-model="listQuery.host_unit" size="small" style="width: 200px;" class="filter-item" clearable @keyup.enter.native="handleFilter"/>
           <el-date-picker
             v-model="listQuery.start_time"
@@ -33,7 +33,7 @@
         <el-table-column slot="tableColumn" :label="$t('table.registNum')" align="center" prop="sign_num"/>
         <el-table-column slot="tableColumn" :label="$t('table.registration')" align="center" prop="sign_num">
           <template slot-scope="scope">
-            <el-button type="primary" size="mini" @click="showSign(scope.row.activity_id)">查看报名情况</el-button>
+            <el-button type="success" size="mini" @click="showSign(scope.row.activity_id)">查看报名情况</el-button>
           </template>
         </el-table-column>
         <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
@@ -57,7 +57,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item :label="$t('table.photo')">
-          <uploadimg :imglist="imgList" @getimg="getImgurl"/>
+          <uploadimg ref="uploadImgs" :imglist="imgList" @getimg="getImgurl"/>
         </el-form-item>
         <el-form-item :label="$t('table.phone')">
           <el-input v-model="temp.link_phone"/>
@@ -206,6 +206,7 @@ export default {
     handleCreate() {
       this.resetTemp()
       this.$refs.tiny.setContent('')
+      this.$refs.uploadImgs.clearFile()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -236,7 +237,7 @@ export default {
             } else {
               this.$notify.error({
                 title: '失败',
-                message: '创建失败',
+                message: re.data.msg || '创建失败',
                 duration: 2000
               })
             }
@@ -247,19 +248,21 @@ export default {
     handleUpdate(row) {
       this.listLoading = true
       this.dialogStatus = 'update'
+      this.imgList = []
       this.$r.get(this.api.info + '/' + row).then(re => {
         console.log(re)
         if (re.data.status === 'success') {
           this.dialogFormVisible = true
           this.temp = re.data.result
-          this.$refs.tiny.setContent(re.data.result.body)
+          this.imgList.push({ name: re.data.result.title, url: re.data.result.cover })
+          this.$refs.tiny.setContent(re.data.result.body || '')
           this.value4[0] = re.data.result.start_time || ''
           this.value4[1] = re.data.result.end_time || ''
           this.value4 = this.value4.concat()
         } else {
           this.$notify.error({
             title: '失败',
-            message: '获取失败',
+            message: re.data.msg || '获取失败',
             duration: 2000
           })
         }
@@ -302,7 +305,7 @@ export default {
             } else {
               this.$notify.error({
                 title: '失败',
-                message: '修改失败',
+                message: re.data.msg || '修改失败',
                 duration: 2000
               })
             }

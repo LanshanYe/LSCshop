@@ -10,6 +10,7 @@
           <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
         </div>
         <el-table-column slot="tableColumn" :label="$t('table.title')" prop="title" align="center"/>
+        <el-table-column slot="tableColumn" :label="$t('table.abstract')" prop="abstract" align="center"/>
         <el-table-column slot="tableColumn" :label="$t('table.type')" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.type | filterType }}</span>
@@ -34,6 +35,9 @@
         </el-form-item>
         <el-form-item :label="$t('table.title')">
           <el-input v-model="temp.title" type="text"/>
+        </el-form-item>
+        <el-form-item :label="$t('table.abstract')">
+          <el-input v-model="temp.abstract" type="text"/>
         </el-form-item>
         <el-form-item :label="$t('table.content')">
           <tinymce ref="tiny" :height="400" v-model="temp.content"/>
@@ -187,7 +191,7 @@ export default {
         if (re.data.status === 'success') {
           this.dialogStatus = 'update'
           this.temp = re.data.result
-          this.$refs.tiny.setContent(re.data.result.content)
+          this.$refs.tiny.setContent(re.data.result.content || '')
           this.dialogFormVisible = true
           this.$nextTick(() => {
             this.$refs['dataForm'].clearValidate()

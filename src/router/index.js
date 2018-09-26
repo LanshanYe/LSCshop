@@ -129,7 +129,7 @@ export const asyncRouterMap = [
         name: 'Documentation',
         zhname: '借书管理',
         promiss: 'readManage-borrow',
-        meta: { title: 'borrowBook', icon: 'documentation', roles: ['admin', 'readManage-borrow'] }
+        meta: { title: 'borrowBook', roles: ['admin', 'readManage-borrow'] }
       },
       {
         path: 'Rcard', // 读者列表
@@ -137,7 +137,7 @@ export const asyncRouterMap = [
         name: 'Rcard',
         zhname: '读者列表',
         promiss: 'readManage-card',
-        meta: { title: 'rcard', icon: 'documentation', roles: ['admin', 'readManage-card'] }
+        meta: { title: 'rcard', roles: ['admin', 'readManage-card'] }
       },
       // {
       //   path: 'readerManage', // 读者管理
@@ -153,7 +153,7 @@ export const asyncRouterMap = [
         name: 'Ractive',
         zhname: '活动管理',
         promiss: 'readManage-active',
-        meta: { title: 'ractive', icon: 'documentation', roles: ['admin', 'readManage-active'] }
+        meta: { title: 'ractive', roles: ['admin', 'readManage-active'] }
       }
     ]
   },
@@ -174,7 +174,7 @@ export const asyncRouterMap = [
         name: 'Guide',
         zhname: '捐赠文档管理',
         promiss: 'donationManage-doc',
-        meta: { title: 'donationDoc', icon: 'guide', roles: ['admin', 'donationManage-doc'] }
+        meta: { title: 'donationDoc', roles: ['admin', 'donationManage-doc'] }
       },
       {
         path: 'donationList', //  捐赠图书列表
@@ -182,7 +182,7 @@ export const asyncRouterMap = [
         name: 'DonationList',
         zhname: '捐赠图书列表',
         promiss: 'donationManage-booklist',
-        meta: { title: 'donationList', icon: 'guide', roles: ['admin', 'donationManage-booklist'] }
+        meta: { title: 'donationList', roles: ['admin', 'donationManage-booklist'] }
       },
       {
         path: 'mainDonation', //  重要捐赠管理
@@ -190,7 +190,7 @@ export const asyncRouterMap = [
         name: 'MainDonation',
         zhname: '重要捐赠管理',
         promiss: 'donationManage-mainbook',
-        meta: { title: 'mainDonation', icon: 'guide', roles: ['admin', 'donationManage-mainbook'] }
+        meta: { title: 'mainDonation', roles: ['admin', 'donationManage-mainbook'] }
       }
     ]
   },
@@ -205,7 +205,7 @@ export const asyncRouterMap = [
         path: 'index',
         component: () => import('@/views/infoManage/infoManage'),
         name: 'InfoManage',
-        meta: { title: 'icons', icon: 'icon', roles: ['admin', 'infoManage'] }
+        meta: { title: 'icons', roles: ['admin', 'infoManage'] }
       }
     ]
   },
@@ -221,7 +221,7 @@ export const asyncRouterMap = [
         path: 'serviceList', // 服务指南
         component: () => import('@/views/tab/serviceList'),
         name: 'ServiceList',
-        meta: { title: 'serviceList', icon: 'tab', roles: ['admin', 'service'] }
+        meta: { title: 'serviceList', roles: ['admin', 'service'] }
       }
     ]
   },
@@ -370,13 +370,13 @@ export const asyncRouterMap = [
     zhname: '系统设置',
     redirect: 'noredirect',
     promiss: 'systemSetup',
-    meta: { roles: ['admin', 'systemSetup'] },
+    meta: { icon: 'clipboard', roles: ['admin', 'systemSetup'] },
     children: [
       {
         path: 'index',
         component: () => import('@/views/systemSetup/index'),
         name: 'SystemSetup',
-        meta: { title: 'systemSetup', icon: 'clipboard', roles: ['admin', 'systemSetup'] }
+        meta: { title: 'systemSetup', roles: ['admin', 'systemSetup'] }
       }
     ]
   },
@@ -394,7 +394,7 @@ export const asyncRouterMap = [
         name: 'AddAdmin',
         zhname: '角色管理',
         promiss: 'adminManage-addAdmin',
-        meta: { title: 'addAdmin', icon: 'international', roles: ['admin', 'adminManage-addAdmin'] }
+        meta: { title: 'addAdmin', roles: ['admin', 'adminManage-addAdmin'] }
       },
       {
         path: 'index', // 管理员管理
@@ -402,7 +402,7 @@ export const asyncRouterMap = [
         name: 'I18n',
         zhname: '管理员管理',
         promiss: 'adminManage-index',
-        meta: { title: 'i18n', icon: 'international', noCache: true, roles: ['admin', 'adminManage-index'] }
+        meta: { title: 'i18n', noCache: true, roles: ['admin', 'adminManage-index'] }
       },
       {
         path: 'adminLog', // 管理员日志
@@ -410,7 +410,7 @@ export const asyncRouterMap = [
         name: 'AdminLog',
         promiss: 'adminManage-log',
         zhname: '管理员日志',
-        meta: { title: 'adminLog', icon: 'international', roles: ['admin', 'adminManage-log'] }
+        meta: { title: 'adminLog', roles: ['admin', 'adminManage-log'] }
       }
     ]
   },
@@ -421,13 +421,39 @@ export const asyncRouterMap = [
     zhname: '你读书我买单管理',
     redirect: 'noredirect',
     promiss: 'ureadManage',
-    meta: { roles: ['admin', 'ureadManage'] },
+    meta: { icon: 'clipboard', roles: ['admin', 'ureadManage'] },
     children: [
       {
         path: 'index',
         component: () => import('@/views/clipboard/index'),
         name: 'ClipboardDemo',
-        meta: { title: 'clipboardDemo', icon: 'clipboard', roles: ['admin', 'ureadManage'] }
+        meta: { title: 'clipboardDemo', roles: ['admin', 'ureadManage'] }
+      }
+    ]
+  },
+
+  {
+    path: '/passenger', // 客流管理
+    component: Layout,
+    zhname: '客流管理',
+    promiss: 'passenger',
+    meta: { title: 'passenger', icon: 'peoples', roles: ['admin', 'passenger'] },
+    children: [
+      {
+        path: 'passengerequipment', // 客流设备管理
+        component: () => import('@/views/passenger/passengerequipment'),
+        name: 'passengerEquipment',
+        promiss: 'passenger-equipment',
+        zhname: '客流设备管理',
+        meta: { title: 'passengerEquipment', roles: ['admin', 'passenger-equipment'] }
+      },
+      {
+        path: 'passengerdata', // 客流数据管理
+        component: () => import('@/views/passenger/passengerdata'),
+        name: 'passengerData',
+        promiss: 'passenger-data',
+        zhname: '客流数据管理',
+        meta: { title: 'passengerData', roles: ['admin', 'passenger-data'] }
       }
     ]
   },

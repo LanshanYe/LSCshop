@@ -1,6 +1,5 @@
 <template>
   <div class="login-container">
-
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
@@ -68,6 +67,7 @@ export default {
         username: '',
         password: ''
       },
+      bgimage: 'http://taoyuan.ydxxtech.com/images/service/201809255ba9fbd9d2d70.png',
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]

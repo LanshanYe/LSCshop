@@ -38,7 +38,7 @@
     <template v-if="device!=='mobile'">
       <div class="middel-menu">
         <div class="middel-menu-logo">
-          logo
+          <img src="@/assets/image/LOGO.png" alt="">
         </div>
         <div class="middle-lines"/>
         <div class="middel-menu-title">

@@ -1,6 +1,6 @@
 <template>
   <el-row :gutter="40" class="panel-group">
-    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
+    <el-col :xs="24" :sm="12" :lg="8" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('day')">
         <div class="card-panel-icon-wrapper icon-people">
           <svg-icon icon-class="peoples" class-name="card-panel-icon" />
@@ -11,7 +11,7 @@
         </div>
       </div>
     </el-col>
-    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
+    <el-col :xs="24" :sm="12" :lg="8" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('month')">
         <div class="card-panel-icon-wrapper icon-message">
           <svg-icon icon-class="peoples" class-name="card-panel-icon" />
@@ -22,7 +22,7 @@
         </div>
       </div>
     </el-col>
-    <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
+    <el-col :xs="24" :sm="12" :lg="8" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('year')">
         <div class="card-panel-icon-wrapper icon-money">
           <svg-icon icon-class="peoples" class-name="card-panel-icon" />
@@ -108,6 +108,7 @@ export default {
   margin-top: 18px;
   .card-panel-col{
     margin-bottom: 32px;
+    min-width: 315px;
   }
   .card-panel {
     height: 108px;
@@ -162,10 +163,10 @@ export default {
     .card-panel-description {
       float: right;
       font-weight: bold;
-      margin-top: 26px;
+      margin-top: 16px;
       margin-right: 32px;
       .card-panel-text {
-        line-height: 24px;
+        line-height: 36px;
         color: rgba(0, 0, 0, 0.45);
         font-size: 16px;
       }

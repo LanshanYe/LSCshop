@@ -7,11 +7,11 @@
         </div>
         <el-table-column slot="tableColumn" :label="$t('table.photo')" align="center">
           <template slot-scope="scope">
-            <img :src="scope.row.service_image || ''" alt="">
+            <img :src="scope.row.service_image || ''" style="max-width: 100%" alt="">
           </template>
         </el-table-column>
         <el-table-column slot="tableColumn" :label="$t('table.title')" prop="service_title" align="center"/>
-        <el-table-column slot="tableColumn" :label="$t('table.contentValidity')" prop="sunmary" align="center"/>
+        <el-table-column slot="tableColumn" :label="$t('table.contentValidity')" prop="summary" align="center"/>
         <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button type="primary" size="mini" @click="handleUpdate(scope.row.service_id)">{{ $t('table.edit') }}</el-button>
@@ -23,6 +23,9 @@
     </div>
     <div v-show="dialogFormVisible" class="app-container">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="80px" style="width: 100%;">
+        <el-form-item :label="$t('table.sort')">
+          <el-input v-model="temp.order" placeholder="数字越大越在前"/>
+        </el-form-item>
         <el-form-item :label="$t('table.photo')">
           <uploadimg :imglist="imgList" @getimg="getImgurl"/>
         </el-form-item>
@@ -88,6 +91,7 @@ export default {
       ],
       listLoading: true,
       listQuery: {},
+      isload: false,
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {},
@@ -163,7 +167,11 @@ export default {
       })
     },
     handleUpdate(row) {
+      if (this.isload) {
+        return false
+      }
       this.listLoading = true
+      this.isload = true
       this.dialogStatus = 'update'
       this.imgList = []
       this.$r.get(this.api.info + '/' + row).then(re => {
@@ -172,7 +180,7 @@ export default {
           this.dialogFormVisible = true
           this.temp = re.data.result
           this.imgList.push({ name: re.data.result.service_title, url: re.data.result.service_image })
-          this.$refs.tiny.setContent(re.data.result.content)
+          this.$refs.tiny.setContent(re.data.result.content || '')
         } else {
           this.$notify.error({
             title: '失败',
@@ -181,8 +189,10 @@ export default {
           })
         }
         this.listLoading = false
+        this.isload = false
       }).catch(errs => {
         this.listLoading = false
+        this.isload = false
         console.log(errs)
       })
     },

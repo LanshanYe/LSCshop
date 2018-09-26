@@ -2,7 +2,7 @@
   <div class="app-container">
     <div v-show="dialogFormVisible">
       <div class="filter-container">
-        <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-upload">上传爱心捐赠单</el-button>
+        <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-upload" @click="uploaddialog = true">上传爱心捐赠单</el-button>
       </div>
       <el-table
         v-loading="listLoading"
@@ -17,12 +17,7 @@
         <el-table-column :label="$t('table.docName')" width="200px" align="center" prop="display_name"/>
         <el-table-column :label="$t('table.docContent')" align="center" prop="value">
           <template slot-scope="scope">
-            <el-tooltip :disabled="scope.row.value&&scope.row.value.length>200?false:true" popper-class="itemtip" effect="dark" placement="bottom">
-              <div slot="content">
-                <div v-html="scope.row.value"/>
-              </div>
-              <div v-html="scope.row.value&&scope.row.value.length > 200 ? scope.row.value.substr(0, 200) + '...' : scope.row.value"/>
-            </el-tooltip>
+            <div v-html="scope.row.value&&scope.row.value.length > 50 ? scope.row.value.substr(0, 50) + '...' : scope.row.value"/>
           </template>
         </el-table-column>
         <el-table-column :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
@@ -46,11 +41,29 @@
         <el-button type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
       </div>
     </div>
+    <el-dialog
+      :visible.sync="uploaddialog"
+      title="上传"
+      width="400px">
+      <el-upload
+        :headers="token"
+        :on-success="handlesuccess"
+        class="upload-demo"
+        drag
+        name="donate_file"
+        action="http://taoyuan.ydxxtech.com/admin/donate/upload_documentation"
+        multiple>
+        <i class="el-icon-upload"/>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <div slot="tip" class="el-upload__tip">文件大小不超过10M</div>
+      </el-upload>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import Tinymce from '@/components/Tinymce'
+import { getToken } from '@/utils/auth'
 import waves from '@/directive/waves' // 水波纹指令
 
 export default {
@@ -65,6 +78,9 @@ export default {
       list: null,
       total: null,
       value4: '',
+      token: {
+        Authorization: 'Bearer ' + getToken()
+      },
       typedata: [
         { label: '捐赠说明', value: 1 },
         { label: '捐赠方法', value: 2 },
@@ -83,6 +99,7 @@ export default {
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {},
+      uploaddialog: false,
       dialogFormVisible: true,
       dialogStatus: '',
       textMap: {
@@ -187,7 +204,7 @@ export default {
         if (re.data.status === 'success') {
           this.dialogFormVisible = false
           this.temp = re.data.result
-          this.$refs.tiny.setContent(re.data.result.value)
+          this.$refs.tiny.setContent(re.data.result.value || '')
         } else {
           this.$notify.error({
             title: '失败',
@@ -196,6 +213,20 @@ export default {
           })
         }
       }).catch(errs => { console.log(errs) })
+    },
+    handlesuccess(re, file, filelist) {
+      if (re.data.state === 'success') {
+        this.$notify({
+          title: '成功',
+          type: 'success',
+          message: re.data.msg || '上传成功'
+        })
+      } else {
+        this.$notify.error({
+          title: '失败',
+          message: re.data.msg || '获取失败'
+        })
+      }
     }
   }
 }

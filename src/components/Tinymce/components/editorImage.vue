@@ -10,8 +10,9 @@
         :on-remove="handleRemove"
         :on-success="handleSuccess"
         :before-upload="beforeUpload"
+        name="image"
         class="editor-slide-upload"
-        action="https://httpbin.org/post"
+        action="http://taoyuan.ydxxtech.com/admin/imageupload"
         list-type="picture-card">
         <el-button size="mini" type="primary">点击上传</el-button>
       </el-upload>
@@ -55,11 +56,12 @@ export default {
       this.dialogVisible = false
     },
     handleSuccess(response, file) {
+      console.log(response, file)
       const uid = file.uid
       const objKeyArr = Object.keys(this.listObj)
       for (let i = 0, len = objKeyArr.length; i < len; i++) {
         if (this.listObj[objKeyArr[i]].uid === uid) {
-          this.listObj[objKeyArr[i]].url = response.files.file
+          this.listObj[objKeyArr[i]].url = response.msg
           this.listObj[objKeyArr[i]].hasSuccess = true
           return
         }

@@ -38,7 +38,7 @@
       <el-table-column slot="tableColumn" :label="$t('table.number')" prop="book_num" align="center"/>
       <el-table-column slot="tableColumn" :label="$t('table.donationDate')" prop="donate_time" align="center"/>
     </query>
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%" min-width="1200px">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="500px" min-width="1200px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="80px" style="width: 100%;">
         <el-form-item :label="$t('table.name')">
           <el-input v-model="temp.real_name"/>
