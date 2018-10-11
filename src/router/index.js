@@ -153,7 +153,7 @@ export const asyncRouterMap = [
         name: 'Ractive',
         zhname: '活动管理',
         promiss: 'readManage-active',
-        meta: { title: 'ractive', roles: ['admin', 'readManage-active'] }
+        meta: { title: 'ractive', noCache: true, roles: ['admin', 'readManage-active'] }
       }
     ]
   },
@@ -195,6 +195,42 @@ export const asyncRouterMap = [
     ]
   },
   {
+    path: '/resource', // 资源管理
+    component: Layout,
+    zhname: '资源管理',
+    promiss: 'resource',
+    meta: {
+      title: 'resource', icon: 'example',
+      roles: ['admin', 'resource']
+    },
+    children: [
+      {
+        path: 'index', // 资源管理
+        zhname: '资源管理',
+        promiss: 'resourceindex',
+        component: () => import('@/views/resourceManage/resource'),
+        name: 'resource',
+        meta: { title: 'resource', roles: ['admin', 'resourceindex'] }
+      },
+      {
+        path: 'resourcetype', //  资源类型管理
+        component: () => import('@/views/resourceManage/resourcetype'),
+        name: 'resourcetype',
+        zhname: '资源类型管理',
+        promiss: 'resourcetype',
+        meta: { title: 'resourcetype', roles: ['admin', 'resourcetype'] }
+      },
+      {
+        path: 'bookresource', //  图书资源
+        component: () => import('@/views/resourceManage/bookresource'),
+        name: 'bookresource',
+        zhname: '图书资源',
+        promiss: 'bookresource',
+        meta: { title: 'bookresource', roles: ['admin', 'bookresource'] }
+      }
+    ]
+  },
+  {
     path: '/infoManage', // 资讯管理
     component: Layout,
     zhname: '资讯管理',
@@ -206,6 +242,21 @@ export const asyncRouterMap = [
         component: () => import('@/views/infoManage/infoManage'),
         name: 'InfoManage',
         meta: { title: 'icons', roles: ['admin', 'infoManage'] }
+      }
+    ]
+  },
+  {
+    path: '/banner', // 轮播图管理
+    component: Layout,
+    zhname: '轮播图管理',
+    promiss: 'banner',
+    meta: { title: 'banner', icon: 'list', roles: ['admin', 'banner'] },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/banner/banner'),
+        name: 'banner',
+        meta: { title: 'banner', roles: ['admin', 'banner'] }
       }
     ]
   },

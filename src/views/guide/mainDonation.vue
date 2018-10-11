@@ -12,6 +12,12 @@
         </template>
       </el-table-column>
       <el-table-column slot="tableColumn" :label="$t('table.abstract')" align="center" prop="abstract"/>
+      <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+          <el-button type="primary" size="mini" @click="handleUpdate(scope.row.donate_id)">{{ $t('table.edit') }}</el-button>
+          <!--<el-button size="mini" type="danger" @click="handleModifyStatus(scope.row.donate_id)">{{ $t('table.delete') }}</el-button>-->
+        </template>
+      </el-table-column>
     </query>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%" min-width="1200px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="80px" style="width: 100%;">
@@ -25,7 +31,7 @@
           <el-input v-model="temp.abstract"/>
         </el-form-item>
         <el-form-item :label="$t('table.photo')">
-          <uploadimg @getimg="getImgurl"/>
+          <uploadimg :imglist="imgList" @getimg="getImgurl"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -60,8 +66,12 @@ export default {
       listLoading: true,
       api: {
         fetch: '/donate',
-        add: '/donate-add'
+        add: '/donate-add',
+        info: '/donate_show',
+        edit: '/donate',
+        delete: '/donate'
       },
+      imgList: [],
       listQuery: {
         page: 1,
         is_important: 1
@@ -105,6 +115,7 @@ export default {
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'
+      this.imgList = []
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
@@ -145,22 +156,65 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.$refs.querycomponent.handleUpdate(row)
+      this.listLoading = true
+      this.dialogStatus = 'update'
+      this.imgList = []
+      this.$r.get(this.api.info + '/' + row).then(re => {
+        console.log(re)
+        if (re.data.status === 'success') {
+          this.dialogFormVisible = true
+          this.temp = re.data.result
+          if (re.data.result.images) {
+            this.imgList.push({ name: re.data.result.title, url: re.data.result.images })
+          }
+        } else {
+          this.$notify.error({
+            title: '失败',
+            message: re.data.msg || '获取失败',
+            duration: 2000
+          })
+        }
+        this.listLoading = false
+      }).catch(errs => {
+        this.listLoading = false
+        console.log(errs)
+      })
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.listLoading = true
           const tempData = Object.assign({}, this.temp)
-          this.$r.post(this.api.edit, tempData).then((re) => {
-            console.log(re)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
-          }).catch(errs => { console.log(errs) })
+          var formData = new FormData()
+          for (var j in tempData) {
+            formData.append(j, tempData[j])
+          }
+          const config = {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          }
+          this.$r.post(this.api.edit, formData, config).then((re) => {
+            if (re.data.status === 'success') {
+              this.$refs.querycomponent.getList()
+              console.log(re)
+              this.dialogFormVisible = false
+              this.$notify({
+                title: '成功',
+                message: '更新成功',
+                type: 'success',
+                duration: 2000
+              })
+            } else {
+              this.$notify.error({
+                title: '失败',
+                message: re.data.msg || '修改失败',
+                duration: 2000
+              })
+            }
+            this.listLoading = false
+          }).catch(errs => {
+            this.listLoading = false
+            console.log(errs)
+          })
         }
       })
     },

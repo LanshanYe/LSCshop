@@ -6,8 +6,8 @@
           <svg-icon icon-class="peoples" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">今日办证人数：<span><count-to :start-val="0" :end-val="data.todayCertificate || 0" :duration="1000" class="card-panel-num"/></span></div>
-          <div class="card-panel-text">今日借出图书数：<span><count-to :start-val="0" :end-val="data.todayBorrow || 0" :duration="1000" class="card-panel-num"/></span></div>
+          <div class="card-panel-text">今日办证人数：<span><count-to :start-val="0" :end-val="parseInt(data.todayCertificate) || 0" :duration="1000" class="card-panel-num"/></span></div>
+          <div class="card-panel-text">今日借出图书数：<span><count-to :start-val="0" :end-val="parseInt(data.todayBorrow) || 0" :duration="1000" class="card-panel-num"/></span></div>
         </div>
       </div>
     </el-col>
@@ -17,8 +17,8 @@
           <svg-icon icon-class="peoples" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">本月办证人数：<span><count-to :start-val="0" :end-val="data.monthCertificate || 0" :duration="1000" class="card-panel-num"/></span></div>
-          <div class="card-panel-text">本月借出图书数：<span><count-to :start-val="0" :end-val="data.monthBorrow || 0" :duration="1000" class="card-panel-num"/></span></div>
+          <div class="card-panel-text">本月办证人数：<span><count-to :start-val="0" :end-val="parseInt(data.monthCertificate) || 0" :duration="1000" class="card-panel-num"/></span></div>
+          <div class="card-panel-text">本月借出图书数：<span><count-to :start-val="0" :end-val="parseInt(data.monthBorrow) || 0" :duration="1000" class="card-panel-num"/></span></div>
         </div>
       </div>
     </el-col>
@@ -28,8 +28,8 @@
           <svg-icon icon-class="peoples" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">本年办证人数：<span><count-to :start-val="0" :end-val="data.yearCertificate || 0" :duration="1000" class="card-panel-num"/></span></div>
-          <div class="card-panel-text">本年借出图书数：<span><count-to :start-val="0" :end-val="data.yearBorrow || 0" :duration="1000" class="card-panel-num"/></span></div>
+          <div class="card-panel-text">本年办证人数：<span><count-to :start-val="0" :end-val="parseInt(data.yearCertificate) || 0" :duration="1000" class="card-panel-num"/></span></div>
+          <div class="card-panel-text">本年借出图书数：<span><count-to :start-val="0" :end-val="parseInt(data.yearBorrow) || 0" :duration="1000" class="card-panel-num"/></span></div>
         </div>
       </div>
     </el-col>

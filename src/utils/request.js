@@ -3,9 +3,27 @@ import { Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 
+const url = window.location.href.split('#')[0]
+let apiUrl = ''
+if (url.indexOf('taoyuan.ydxxtech.com') !== -1) {
+  apiUrl = 'http://taoyuan.ydxxtech.com/admin'
+} else if (url.indexOf('tytsg.cn') !== -1) {
+  if (url.indexOf('www') !== -1) {
+    apiUrl = 'https://www.tytsg.cn/admin'
+  } else {
+    apiUrl = 'https://tytsg.cn/admin'
+  }
+} else {
+  apiUrl = '/api'
+}
+if (apiUrl === '/api') {
+  store.dispatch('setUrl', 'https://tytsg.cn/admin')
+} else {
+  store.dispatch('setUrl', apiUrl)
+}
 // create an axios instance
 const service = axios.create({
-  baseURL: process.env.BASE_API, // api 的 base_url
+  baseURL: apiUrl, // api 的 base_url
   timeout: 30000 // request timeout
 })
 
@@ -69,6 +87,13 @@ service.interceptors.response.use(
       type: 'error',
       duration: 5 * 1000
     })
+    if (error.response) {
+      if (error.response.status === 401) {
+        store.dispatch('FedLogOut').then(() => {
+          location.reload() // 为了重新实例化vue-router对象 避免bug
+        })
+      }
+    }
     return Promise.reject(error)
   }
 )

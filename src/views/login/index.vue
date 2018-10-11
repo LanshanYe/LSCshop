@@ -105,7 +105,6 @@ export default {
         if (valid) {
           this.loading = true
           this.$store.dispatch('LoginByUsername', this.loginForm).then((re) => {
-            console.log(re)
             if (re.data.status === 'error') {
               this.$message.error(re.data.msg)
             }

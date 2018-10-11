@@ -214,7 +214,6 @@ export default {
       })
     },
     createData() {
-      console.log(this.api.add, this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           var formData = new FormData()
@@ -250,11 +249,12 @@ export default {
       this.dialogStatus = 'update'
       this.imgList = []
       this.$r.get(this.api.info + '/' + row).then(re => {
-        console.log(re)
         if (re.data.status === 'success') {
           this.dialogFormVisible = true
           this.temp = re.data.result
-          this.imgList.push({ name: re.data.result.title, url: re.data.result.cover })
+          if (re.data.result.cover) {
+            this.imgList.push({ name: re.data.result.title, url: re.data.result.cover })
+          }
           this.$refs.tiny.setContent(re.data.result.body || '')
           this.value4[0] = re.data.result.start_time || ''
           this.value4[1] = re.data.result.end_time || ''
@@ -294,7 +294,6 @@ export default {
           this.$r.post(this.api.add, formData, config).then((re) => {
             if (re.data.status === 'success') {
               this.$refs.querycomponent.getList()
-              console.log(re)
               this.dialogFormVisible = false
               this.$notify({
                 title: '成功',
@@ -321,7 +320,6 @@ export default {
       this.temp.image = d
     },
     timechange(d) {
-      console.log(d)
       if (d) {
         this.temp.start_time = d[0]
         this.temp.end_time = d[1]

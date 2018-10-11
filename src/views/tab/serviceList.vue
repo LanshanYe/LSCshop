@@ -127,6 +127,7 @@ export default {
     handleCreate() {
       this.resetTemp()
       this.$refs.tiny.setContent('')
+      this.imgList = []
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -134,7 +135,6 @@ export default {
       })
     },
     createData() {
-      console.log(this.api.add, this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           var formData = new FormData()
@@ -145,7 +145,6 @@ export default {
             headers: { 'Content-Type': 'multipart/form-data' }
           }
           this.$r.post(this.api.add, formData, config).then((re) => {
-            console.log(re)
             if (re.data.status === 'success') {
               this.dialogFormVisible = false
               this.$refs.querycomponent.getList(1)
@@ -175,7 +174,6 @@ export default {
       this.dialogStatus = 'update'
       this.imgList = []
       this.$r.get(this.api.info + '/' + row).then(re => {
-        console.log(re)
         if (re.data.status === 'success') {
           this.dialogFormVisible = true
           this.temp = re.data.result
@@ -210,7 +208,6 @@ export default {
           this.$r.post(this.api.edit, formData, config).then((re) => {
             if (re.data.status === 'success') {
               this.$refs.querycomponent.getList()
-              console.log(re)
               this.dialogFormVisible = false
               this.$notify({
                 title: '成功',

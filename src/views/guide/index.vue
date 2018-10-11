@@ -123,7 +123,6 @@ export default {
     getList() {
       this.listLoading = true
       this.$r.get(this.api.fetch, this.listQuery).then(response => {
-        console.log(response)
         this.list = response.data.result
 
         // Just to simulate the time of the request
@@ -168,7 +167,6 @@ export default {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           this.$r.put(this.api.edit + '/' + tempData.id, tempData).then((re) => {
-            console.log(re)
             if (re.data.status === 'success') {
               this.dialogFormVisible = true
               this.getList()
@@ -200,7 +198,6 @@ export default {
     },
     view(d) {
       this.$r.get(this.api.info + '/' + d).then(re => {
-        console.log(re)
         if (re.data.status === 'success') {
           this.dialogFormVisible = false
           this.temp = re.data.result

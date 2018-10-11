@@ -256,7 +256,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           var tempData = Object.assign({}, this.temp)
-          this.$r.put(this.api.edit + '/' + tempData.passenger_id, tempData).then((re) => {
+          this.$r.post(this.api.edit, tempData).then((re) => {
             console.log(re)
             if (re.data.status === 'success') {
               this.dialogFormVisible = false

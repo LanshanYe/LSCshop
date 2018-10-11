@@ -101,16 +101,19 @@ export default {
   },
   methods: {
     getList(n) {
-      console.log('query')
       this.listLoading = true
       if (n) {
         this.listQuery.page = n
       }
       fetchList(this.api.fetch, this.listQuery).then(response => {
-        console.log(response)
         this.list = response.data.result.data
         this.total = response.data.result.total
-
+        if (response.data.result.data === undefined) {
+          if (response.data.result) {
+            this.list = response.data.result
+            this.total = 0
+          }
+        }
         // Just to simulate the time of the request
         this.listLoading = false
       })
@@ -128,15 +131,7 @@ export default {
       this.getList()
     },
     resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
-      }
+      this.temp = {}
     },
     handleCreate() {
       this.resetTemp()
@@ -163,7 +158,6 @@ export default {
       })
     },
     handleUpdate(id) {
-      console.log(id)
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {

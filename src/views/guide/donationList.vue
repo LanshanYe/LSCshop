@@ -37,6 +37,12 @@
       <el-table-column slot="tableColumn" :label="$t('table.price')" prop="book_price" align="center"/>
       <el-table-column slot="tableColumn" :label="$t('table.number')" prop="book_num" align="center"/>
       <el-table-column slot="tableColumn" :label="$t('table.donationDate')" prop="donate_time" align="center"/>
+      <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+          <el-button type="primary" size="mini" @click="handleUpdate(scope.row.donate_id)">{{ $t('table.edit') }}</el-button>
+          <!--<el-button size="mini" type="danger" @click="handleModifyStatus(scope.row.donate_id)">{{ $t('table.delete') }}</el-button>-->
+        </template>
+      </el-table-column>
     </query>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="500px" min-width="1200px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="80px" style="width: 100%;">
@@ -90,7 +96,10 @@ export default {
       total: null,
       api: {
         fetch: '/donate/search',
-        add: '/donate-book/add'
+        add: '/donate-book/add',
+        edit: '/donate_book',
+        delete: '/donate-book',
+        info: '/donate_book_show'
       },
       value4: '',
       listLoading: true,
@@ -104,15 +113,7 @@ export default {
       },
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
-      temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
-      },
+      temp: {},
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -131,12 +132,14 @@ export default {
   },
   mounted() {
     this.$refs.querycomponent.getList()
-    this.$r.get('/donate_index').then(re => {
-      console.log(re)
-      this.queryInputdata = re.data.result
-    }).catch(errs => console.log(errs))
+    this.getcountData()
   },
   methods: {
+    getcountData() {
+      this.$r.get('/donate_index').then(re => {
+        this.queryInputdata = re.data.result
+      }).catch(errs => console.log(errs))
+    },
     handleModifyStatus(row, status) {
       this.$refs.querycomponent.handleModifyStatus(row, status)
     },
@@ -155,14 +158,13 @@ export default {
       })
     },
     createData() {
-      console.log(this.api.add, this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.$r.post(this.api.add, this.temp).then((re) => {
-            console.log(re)
             if (re.data.status === 'success') {
               this.dialogFormVisible = false
               this.$refs.querycomponent.getList()
+              this.getcountData()
               this.$notify({
                 title: '成功',
                 message: '创建成功',
@@ -181,22 +183,57 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.$refs.querycomponent.handleUpdate(row)
+      this.listLoading = true
+      this.dialogStatus = 'update'
+      this.imgList = []
+      this.$r.get(this.api.info + '/' + row).then(re => {
+        if (re.data.status === 'success') {
+          this.dialogFormVisible = true
+          this.temp = re.data.result
+          if (re.data.result.images) {
+            this.imgList.push({ name: re.data.result.title, url: re.data.result.images })
+          }
+        } else {
+          this.$notify.error({
+            title: '失败',
+            message: re.data.msg || '获取失败',
+            duration: 2000
+          })
+        }
+        this.listLoading = false
+      }).catch(errs => {
+        this.listLoading = false
+        console.log(errs)
+      })
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.listLoading = true
           const tempData = Object.assign({}, this.temp)
-          this.$r.post(this.api.edit, tempData).then((re) => {
-            console.log(re)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
-          }).catch(errs => { console.log(errs) })
+          this.$r.put(this.api.edit + '/' + tempData.donate_id, tempData).then((re) => {
+            if (re.data.status === 'success') {
+              this.$refs.querycomponent.getList()
+              this.getcountData()
+              this.dialogFormVisible = false
+              this.$notify({
+                title: '成功',
+                message: '更新成功',
+                type: 'success',
+                duration: 2000
+              })
+            } else {
+              this.$notify.error({
+                title: '失败',
+                message: re.data.msg || '修改失败',
+                duration: 2000
+              })
+            }
+            this.listLoading = false
+          }).catch(errs => {
+            this.listLoading = false
+            console.log(errs)
+          })
         }
       })
     },

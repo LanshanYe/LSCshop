@@ -49,7 +49,7 @@
                 </el-checkbox-group>
               </el-col>
               <el-col v-if="it.children && it.children.length > 1" :span="20" style="border-left: 1px solid #DCDFE6;padding: 0 10px">
-                <el-checkbox-group v-model="temp.permissions" @change="getchecked">
+                <el-checkbox-group v-model="temp.permissions">
                   <el-checkbox v-for="it2 in it.children" :label="it2.promiss" :key="it2.path">{{ it2.zhname }}</el-checkbox>
                 </el-checkbox-group>
               </el-col>
@@ -136,7 +136,6 @@ export default {
       })
     },
     createData() {
-      console.log(this.api.add, this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.$r.post(this.api.add, this.temp).then((re) => {
@@ -164,7 +163,6 @@ export default {
       this.listLoading = true
       this.dialogStatus = 'update'
       this.$r.get(this.api.info + '/' + row).then(re => {
-        console.log(re)
         if (re.data.status === 'success') {
           this.dialogFormVisible = true
           this.temp = re.data.result
@@ -192,7 +190,6 @@ export default {
           this.$r.post(this.api.edit, tempData).then((re) => {
             if (re.data.status === 'success') {
               this.$refs.querycomponent.getList()
-              console.log(re)
               this.dialogFormVisible = false
               this.$notify({
                 title: '成功',
@@ -214,9 +211,6 @@ export default {
           })
         }
       })
-    },
-    getchecked(d) {
-      console.log(d)
     },
     resetTemp() {
       this.temp = {

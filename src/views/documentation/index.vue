@@ -97,7 +97,6 @@ export default {
     },
     handleUpdate(row) {
       this.$r.get(this.api.info + '/' + row).then(re => {
-        console.log(re)
       }).catch(errs => console.log(errs))
       this.$refs.querycomponent.handleUpdate(row)
     },
@@ -111,7 +110,6 @@ export default {
       this.$refs.querycomponent.handleDownload()
     },
     timechange(d) {
-      console.log(d)
       if (d) {
         this.listQuery.startDate = d[0]
         this.listQuery.endDate = d[1]

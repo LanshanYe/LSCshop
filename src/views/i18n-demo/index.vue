@@ -118,7 +118,6 @@ export default {
   },
   created() {
     this.$r.get('role').then(re => {
-      console.log(re)
       this.roledata = re.data.result.data
       this.$refs.querycomponent.getList()
     }).catch(errs => console.log(errs))
@@ -142,7 +141,6 @@ export default {
       })
     },
     createData() {
-      console.log(this.api.add, this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.$r.post(this.api.add, this.temp).then((re) => {
@@ -181,7 +179,6 @@ export default {
         if (valid) {
           var tempData = Object.assign({}, this.temp)
           this.$r.put(this.api.edit + '/' + tempData.notice_id, tempData).then((re) => {
-            console.log(re)
             if (re.data.status === 'success') {
               this.dialogFormVisible = false
               this.$refs.querycomponent.getList()

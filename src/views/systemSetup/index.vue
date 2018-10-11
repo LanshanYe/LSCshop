@@ -39,7 +39,7 @@
           <el-input v-model="temp.display_name" placeholder="请填写四至十六个的汉字" type="text"/>
         </el-form-item>
         <el-form-item :label="$t('table.configtype')">
-          <el-radio-group v-model="temp.type" @change="getdata">
+          <el-radio-group v-model="temp.type">
             <el-radio v-for="(it,index) in typedata" :label="it.value" :key="index" border>{{ it.label }}</el-radio>
           </el-radio-group>
         </el-form-item>
@@ -169,6 +169,7 @@ export default {
     handleCreate() {
       this.resetTemp()
       this.$refs.tiny.setContent('')
+      this.imglist = []
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -176,7 +177,6 @@ export default {
       })
     },
     createData() {
-      console.log(this.api.add, this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           if (this.temp.type === 'image') {
@@ -188,7 +188,6 @@ export default {
               headers: { 'Content-Type': 'multipart/form-data' }
             }
             this.$r.post(this.api.add, formData, config).then((re) => {
-              console.log(re)
               if (re.data.status === 'success') {
                 this.dialogFormVisible = false
                 this.$refs.querycomponent.getList()
@@ -231,7 +230,6 @@ export default {
     },
     handleUpdate(row) {
       this.$r.get(this.api.info + '/' + row).then(re => {
-        console.log(re)
         this.dialogStatus = 'update'
         this.temp = re.data.result
         this.$refs.tiny.setContent(re.data.result.value || '')
@@ -258,7 +256,6 @@ export default {
               headers: { 'Content-Type': 'multipart/form-data' }
             }
             this.$r.post(this.api.edit, formData, config).then((re) => {
-              console.log(re)
               if (re.data.status === 'success') {
                 this.dialogFormVisible = false
                 this.$refs.querycomponent.getList()
@@ -279,7 +276,6 @@ export default {
           } else {
             var tempData = Object.assign({}, this.temp)
             this.$r.post(this.api.edit, tempData).then((re) => {
-              console.log(re)
               if (re.data.status === 'success') {
                 this.dialogFormVisible = false
                 this.$refs.querycomponent.getList()
@@ -302,7 +298,6 @@ export default {
       })
     },
     typechange(d) {
-      console.log(d)
       this.$refs.querycomponent.getList(1)
     },
     handleDelete(row) {
@@ -310,9 +305,6 @@ export default {
     },
     handleDownload() {
       this.$refs.querycomponent.handleDownload()
-    },
-    getdata(d) {
-      console.log(d)
     },
     getImgurl(d) {
       this.temp.image = d
@@ -328,7 +320,6 @@ export default {
           text: '正在同步中。。。'
         })
         this.$r.get('/importvideo').then((re) => {
-          console.log(re)
           if (re.data.status === 'success') {
             this.$notify({
               title: '成功',
