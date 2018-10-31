@@ -47,7 +47,7 @@
     </div>
     <div v-show="dialogFormVisible" class="app-container">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="80px" style="width: 100%;">
-        <el-form-item :label="$t('table.activetheme')">
+        <el-form-item :label="$t('table.activetheme')" prop="title">
           <el-input v-model="temp.title"/>
         </el-form-item>
         <el-form-item :label="$t('table.type')">
@@ -56,28 +56,28 @@
             <el-radio :label="2">{{ $t('table.speaking') }}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item :label="$t('table.photo')">
+        <el-form-item :label="$t('table.photo')" required>
           <uploadimg ref="uploadImgs" :imglist="imgList" @getimg="getImgurl"/>
         </el-form-item>
-        <el-form-item :label="$t('table.phone')">
+        <el-form-item :label="$t('table.phone')" prop="link_phone">
           <el-input v-model="temp.link_phone"/>
         </el-form-item>
-        <el-form-item :label="$t('table.peopleCount')">
+        <el-form-item :label="$t('table.peopleCount')" prop="limit_num">
           <el-input v-model="temp.limit_num"/>
         </el-form-item>
         <el-form-item :label="$t('table.contentValidity')">
           <el-input v-model="temp.description"/>
         </el-form-item>
-        <el-form-item :label="$t('table.hostUnit')">
+        <el-form-item :label="$t('table.hostUnit')" prop="host_unit">
           <el-input v-model="temp.host_unit"/>
         </el-form-item>
         <el-form-item :label="$t('table.activityer')">
           <el-input v-model="temp.object_oriented"/>
         </el-form-item>
-        <el-form-item :label="$t('table.address')">
+        <el-form-item :label="$t('table.address')" prop="activity_place">
           <el-input v-model="temp.activity_place"/>
         </el-form-item>
-        <el-form-item :label="$t('table.time')">
+        <el-form-item :label="$t('table.time')" prop="start_time">
           <el-date-picker
             v-model="value4"
             class="filter-item"
@@ -94,9 +94,9 @@
         </el-form-item>
       </el-form>
       <div class="filter-container">
-        <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
-        <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
+        <el-button @click="cancel">{{ $t('table.cancel') }}</el-button>
+        <el-button v-if="dialogStatus=='create'" :loading="addloading" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
+        <el-button v-else :loading="editloading" type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
       </div>
     </div>
     <el-dialog
@@ -147,6 +147,8 @@ export default {
   data() {
     return {
       tableKey: 0,
+      addloading: false,
+      editloading: false,
       list: null,
       total: null,
       value4: [],
@@ -168,7 +170,9 @@ export default {
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
-        type: 1
+        type: 1,
+        start_time: '',
+        image: null
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -181,9 +185,12 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        title: [{ required: true, message: '请填写活动主题', trigger: 'blur' }],
+        host_unit: [{ required: true, message: '请填写主办单位', trigger: 'blur' }],
+        link_phone: [{ required: true, message: '请填写手机号', trigger: 'blur' }],
+        activity_place: [{ required: true, message: '请填写活动地点', trigger: 'blur' }],
+        start_time: [{ required: true, message: '请选择活动时间', trigger: 'change' }],
+        limit_num: [{ required: true, message: '请填写活动人数', trigger: 'blur' }]
       },
       downloadLoading: false
     }
@@ -195,18 +202,25 @@ export default {
     handleModifyStatus(row) {
       this.$refs.querycomponent.deleteData(row)
     },
+    cancel() {
+      this.dialogFormVisible = false
+      this.$refs['dataForm'].clearValidate()
+    },
     handleFilter() {
       this.$refs.querycomponent.handleFilter()
     },
     resetTemp() {
       this.temp = {
-        type: 1
+        type: 1,
+        start_time: '',
+        image: null
       }
     },
     handleCreate() {
       this.resetTemp()
       this.$refs.tiny.setContent('')
       this.$refs.uploadImgs.clearFile()
+      this.value4 = []
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -214,8 +228,18 @@ export default {
       })
     },
     createData() {
+      if (this.temp.image === '' || this.temp.image === undefined || this.temp.image === null) {
+        this.$notify({
+          title: '提示',
+          type: 'warning',
+          message: '请选择图片！'
+        })
+        return false
+      }
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.addloading = true
+          this.listLoading = true
           var formData = new FormData()
           for (var j in this.temp) {
             formData.append(j, this.temp[j])
@@ -240,7 +264,13 @@ export default {
                 duration: 2000
               })
             }
-          }).catch(errs => { console.log(errs) })
+            this.addloading = false
+            this.listLoading = false
+          }).catch(errs => {
+            this.addloading = false
+            this.listLoading = false
+            console.log(errs)
+          })
         }
       })
     },
@@ -254,6 +284,7 @@ export default {
           this.temp = re.data.result
           if (re.data.result.cover) {
             this.imgList.push({ name: re.data.result.title, url: re.data.result.cover })
+            this.temp.image = re.data.result.cover
           }
           this.$refs.tiny.setContent(re.data.result.body || '')
           this.value4[0] = re.data.result.start_time || ''
@@ -280,8 +311,17 @@ export default {
       })
     },
     updateData() {
+      if (this.temp.image === '' || this.temp.image === undefined || this.temp.image === null) {
+        this.$notify({
+          title: '提示',
+          type: 'warning',
+          message: '请选择图片！'
+        })
+        return false
+      }
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.editloading = true
           this.listLoading = true
           const tempData = Object.assign({}, this.temp)
           var formData = new FormData()
@@ -309,8 +349,10 @@ export default {
               })
             }
             this.listLoading = false
+            this.editloading = false
           }).catch(errs => {
             this.listLoading = false
+            this.editloading = false
             console.log(errs)
           })
         }
@@ -321,8 +363,15 @@ export default {
     },
     timechange(d) {
       if (d) {
-        this.temp.start_time = d[0]
-        this.temp.end_time = d[1]
+        const startT = new Date(d[0]).getTime()
+        const nowT = new Date().getTime()
+        if (startT < nowT) {
+          this.$message.warning('活动开始时间不能小于当前时间')
+          this.value4 = []
+        } else {
+          this.temp.start_time = d[0]
+          this.temp.end_time = d[1]
+        }
       } else {
         this.temp.start_time = ''
         this.temp.end_time = ''

@@ -58,8 +58,8 @@
         </el-form-item>
         <div class="filter-container">
           <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-          <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
-          <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
+          <el-button v-if="dialogStatus=='create'" :loading="addloading" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
+          <el-button v-else :loading="editloading" type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
         </div>
       </el-form>
     </div>
@@ -93,6 +93,8 @@ export default {
         description: '',
         permissions: []
       },
+      addloading: false,
+      editloading: false,
       dialogStatus: '',
       dialogFormVisible: false,
       api: {
@@ -138,6 +140,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.addloading = true
           this.$r.post(this.api.add, this.temp).then((re) => {
             if (re.data.status === 'success') {
               this.$refs.querycomponent.getList(1)
@@ -155,7 +158,11 @@ export default {
                 duration: 2000
               })
             }
-          }).catch(errs => { console.log(errs) })
+            this.addloading = false
+          }).catch(errs => {
+            this.addloading = false
+            console.log(errs)
+          })
         }
       })
     },
@@ -186,6 +193,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.listLoading = true
+          this.editloading = true
           const tempData = Object.assign({}, this.temp)
           this.$r.post(this.api.edit, tempData).then((re) => {
             if (re.data.status === 'success') {
@@ -205,8 +213,10 @@ export default {
               })
             }
             this.listLoading = false
+            this.editloading = false
           }).catch(errs => {
             this.listLoading = false
+            this.editloading = false
             console.log(errs)
           })
         }

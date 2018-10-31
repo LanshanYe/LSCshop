@@ -33,6 +33,7 @@
       <el-table-column slot="tableColumn" :label="$t('table.name')" align="center" prop="real_name"/>
       <el-table-column slot="tableColumn" :label="$t('table.phone')" align="center" prop="phone"/>
       <el-table-column slot="tableColumn" :label="$t('table.bookname')" align="center" prop="book_name"/>
+      <el-table-column slot="tableColumn" :label="$t('table.giveword')" align="center" prop="content"/>
       <el-table-column slot="tableColumn" :label="$t('table.press')" align="center" prop="book_press"/>
       <el-table-column slot="tableColumn" :label="$t('table.price')" prop="book_price" align="center"/>
       <el-table-column slot="tableColumn" :label="$t('table.number')" prop="book_num" align="center"/>
@@ -40,7 +41,7 @@
       <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleUpdate(scope.row.donate_id)">{{ $t('table.edit') }}</el-button>
-          <!--<el-button size="mini" type="danger" @click="handleModifyStatus(scope.row.donate_id)">{{ $t('table.delete') }}</el-button>-->
+          <el-button size="mini" type="danger" @click="handleDelete(scope.row.donate_id)">{{ $t('table.delete') }}</el-button>
         </template>
       </el-table-column>
     </query>
@@ -58,6 +59,9 @@
         <el-form-item :label="$t('table.press')">
           <el-input v-model="temp.book_press"/>
         </el-form-item>
+        <el-form-item :label="$t('table.giveword')">
+          <el-input v-model="temp.content"/>
+        </el-form-item>
         <el-form-item :label="$t('table.price')">
           <el-input v-model="temp.book_price"/>
         </el-form-item>
@@ -70,8 +74,8 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
-        <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
+        <el-button v-if="dialogStatus=='create'" :loading="addloading" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
+        <el-button v-else :loading="editloading" type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -93,12 +97,14 @@ export default {
     return {
       tableKey: 0,
       list: null,
+      addloading: false,
+      editloading: false,
       total: null,
       api: {
         fetch: '/donate/search',
         add: '/donate-book/add',
         edit: '/donate_book',
-        delete: '/donate-book',
+        delete: '/donate_book',
         info: '/donate_book_show'
       },
       value4: '',
@@ -140,9 +146,6 @@ export default {
         this.queryInputdata = re.data.result
       }).catch(errs => console.log(errs))
     },
-    handleModifyStatus(row, status) {
-      this.$refs.querycomponent.handleModifyStatus(row, status)
-    },
     handleFilter() {
       this.$refs.querycomponent.handleFilter()
     },
@@ -160,6 +163,8 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.addloading = true
+          this.listLoading = true
           this.$r.post(this.api.add, this.temp).then((re) => {
             if (re.data.status === 'success') {
               this.dialogFormVisible = false
@@ -178,7 +183,13 @@ export default {
                 duration: 2000
               })
             }
-          }).catch(errs => { console.log(errs) })
+            this.addloading = false
+            this.listLoading = false
+          }).catch(errs => {
+            this.addloading = false
+            this.listLoading = false
+            console.log(errs)
+          })
         }
       })
     },
@@ -210,6 +221,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.listLoading = true
+          this.editloading = true
           const tempData = Object.assign({}, this.temp)
           this.$r.put(this.api.edit + '/' + tempData.donate_id, tempData).then((re) => {
             if (re.data.status === 'success') {
@@ -230,15 +242,17 @@ export default {
               })
             }
             this.listLoading = false
+            this.editloading = true
           }).catch(errs => {
             this.listLoading = false
+            this.editloading = true
             console.log(errs)
           })
         }
       })
     },
     handleDelete(row) {
-      this.$refs.querycomponent.handleDelete(row)
+      this.$refs.querycomponent.deleteData(row)
     },
     handleDownload() {
       this.$refs.querycomponent.handleDownload()

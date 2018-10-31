@@ -51,8 +51,8 @@
       </el-form>
       <div class="filter-container">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
-        <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
+        <el-button v-if="dialogStatus=='create'" :loading="addloading" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
+        <el-button v-else :loading="editloading" type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
       </div>
     </div>
   </div>
@@ -85,6 +85,8 @@ export default {
         info: '/setting',
         delete: '/setting'
       },
+      addloading: false,
+      editloading: false,
       total: null,
       value4: '',
       typedata: [
@@ -179,6 +181,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.addloading = true
           if (this.temp.type === 'image') {
             var formData = new FormData()
             for (var j in this.temp) {
@@ -204,7 +207,11 @@ export default {
                   duration: 2000
                 })
               }
-            }).catch(errs => { console.log(errs) })
+              this.addloading = false
+            }).catch(errs => {
+              this.addloading = false
+              console.log(errs)
+            })
           } else {
             this.$r.post(this.api.add, this.temp).then((re) => {
               if (re.data.status === 'success') {
@@ -223,7 +230,11 @@ export default {
                   duration: 2000
                 })
               }
-            }).catch(errs => { console.log(errs) })
+              this.addloading = false
+            }).catch(errs => {
+              this.addloading = false
+              console.log(errs)
+            })
           }
         }
       })
@@ -247,6 +258,7 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.editloading = true
           if (this.temp.type === 'image') {
             var formData = new FormData()
             for (var j in this.temp) {
@@ -272,7 +284,11 @@ export default {
                   duration: 2000
                 })
               }
-            }).catch(errs => { console.log(errs) })
+              this.editloading = false
+            }).catch(errs => {
+              this.editloading = false
+              console.log(errs)
+            })
           } else {
             var tempData = Object.assign({}, this.temp)
             this.$r.post(this.api.edit, tempData).then((re) => {
@@ -292,7 +308,11 @@ export default {
                   duration: 2000
                 })
               }
-            }).catch(errs => { console.log(errs) })
+              this.editloading = false
+            }).catch(errs => {
+              this.editloading = false
+              console.log(errs)
+            })
           }
         }
       })

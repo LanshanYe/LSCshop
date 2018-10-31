@@ -38,7 +38,7 @@
       </el-form>
       <div class="filter-container">
         <el-button @click="dialogFormVisible = true">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
+        <el-button :loading="editloading" type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
       </div>
     </div>
     <el-dialog
@@ -48,10 +48,10 @@
       <el-upload
         :headers="token"
         :on-success="handlesuccess"
+        :action="urls + '/donate/upload_documentation'"
         class="upload-demo"
         drag
         name="donate_file"
-        action="http://taoyuan.ydxxtech.com/admin/donate/upload_documentation"
         multiple>
         <i class="el-icon-upload"/>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -63,6 +63,7 @@
 
 <script>
 import Tinymce from '@/components/Tinymce'
+import store from '@/store'
 import { getToken } from '@/utils/auth'
 import waves from '@/directive/waves' // 水波纹指令
 
@@ -78,9 +79,12 @@ export default {
       list: null,
       total: null,
       value4: '',
+      urls: store.getters.url,
       token: {
         Authorization: 'Bearer ' + getToken()
       },
+      addloading: false,
+      editloading: false,
       typedata: [
         { label: '捐赠说明', value: 1 },
         { label: '捐赠方法', value: 2 },
@@ -165,6 +169,7 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.editloading = true
           const tempData = Object.assign({}, this.temp)
           this.$r.put(this.api.edit + '/' + tempData.id, tempData).then((re) => {
             if (re.data.status === 'success') {
@@ -183,7 +188,11 @@ export default {
                 duration: 2000
               })
             }
-          }).catch(errs => { console.log(errs) })
+            this.editloading = false
+          }).catch(errs => {
+            this.editloading = false
+            console.log(errs)
+          })
         }
       })
     },
@@ -212,16 +221,16 @@ export default {
       }).catch(errs => { console.log(errs) })
     },
     handlesuccess(re, file, filelist) {
-      if (re.data.state === 'success') {
+      if (re.status === 'success') {
         this.$notify({
           title: '成功',
           type: 'success',
-          message: re.data.msg || '上传成功'
+          message: re.msg || '上传成功'
         })
       } else {
         this.$notify.error({
           title: '失败',
-          message: re.data.msg || '获取失败'
+          message: re.msg || '获取失败'
         })
       }
     }

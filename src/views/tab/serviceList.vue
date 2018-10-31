@@ -41,8 +41,8 @@
       </el-form>
       <div class="filter-container">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
-        <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
+        <el-button v-if="dialogStatus=='create'" :loading="addloading" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
+        <el-button v-else :loading="editloading" type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
       </div>
     </div>
   </div>
@@ -69,6 +69,8 @@ export default {
       tableKey: 0,
       list: null,
       total: null,
+      addloading: false,
+      editloading: false,
       api: {
         fetch: '/service_guide',
         add: '/service_guide',
@@ -137,6 +139,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.addloading = true
           var formData = new FormData()
           for (var j in this.temp) {
             formData.append(j, this.temp[j])
@@ -161,7 +164,11 @@ export default {
                 duration: 2000
               })
             }
-          }).catch(errs => { console.log(errs) })
+            this.addloading = false
+          }).catch(errs => {
+            this.addloading = false
+            console.log(errs)
+          })
         }
       })
     },
@@ -198,6 +205,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.listLoading = true
+          this.editloading = true
           var formData = new FormData()
           for (var j in this.temp) {
             formData.append(j, this.temp[j])
@@ -223,8 +231,10 @@ export default {
               })
             }
             this.listLoading = false
+            this.editloading = false
           }).catch(errs => {
             this.listLoading = false
+            this.editloading = false
             console.log(errs)
           })
         }

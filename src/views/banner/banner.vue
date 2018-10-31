@@ -1,46 +1,58 @@
 <template>
-  <div>
+  <div v-loading="listLoading">
     <div v-show="!dialogFormVisible">
       <query ref="querycomponent" :list-query="listQuery" :api="api">
         <div slot="queryFilter">
-          <el-radio-group v-model="listQuery.type" size="small" class="filter-item" @change="typechange">
-            <el-radio-button :label="1">{{ $t('table.noticeNew') }}</el-radio-button>
-            <el-radio-button :label="2">{{ $t('table.infonews') }}</el-radio-button>
+          <el-radio-group v-model="listQuery.is_mobile" size="small" class="filter-item" @change="typechange">
+            <el-radio-button :label="1">{{ $t('table.mobile') }}</el-radio-button>
+            <el-radio-button :label="0">{{ $t('table.PC') }}</el-radio-button>
           </el-radio-group>
           <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+          <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
         </div>
-        <el-table-column slot="tableColumn" :label="$t('table.title')" prop="title" align="center"/>
-        <el-table-column slot="tableColumn" :label="$t('table.abstract')" prop="abstract" align="center"/>
-        <el-table-column slot="tableColumn" :label="$t('table.type')" align="center">
+        <el-table-column slot="tableColumn" :label="$t('table.description')" prop="name" align="center"/>
+        <el-table-column slot="tableColumn" :label="$t('table.photo')" prop="iamge" align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.type | filterType }}</span>
+            <img :src="scope.row.image" style="max-width:100%" alt="">
           </template>
         </el-table-column>
-        <el-table-column slot="tableColumn" :label="$t('table.releaseDate')" prop="created_at" align="center"/>
+        <el-table-column slot="tableColumn" :label="$t('table.type')" prop="type" align="center"/>
+        <el-table-column slot="tableColumn" :label="$t('table.sort')" prop="sort" align="center"/>
         <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
           <template slot-scope="scope">
-            <el-button type="primary" size="mini" @click="handleUpdate(scope.row.notice_id)">{{ $t('table.edit') }}</el-button>
-            <el-button size="mini" type="danger" @click="deleteData(scope.row.notice_id)">{{ $t('table.delete') }}
-            </el-button>
+            <el-button type="primary" size="mini" @click="handleUpdate(scope.row.banner_id)">{{ $t('table.edit') }}</el-button>
+            <el-button size="mini" type="danger" @click="deleteData(scope.row.banner_id)">{{ $t('table.delete') }}</el-button>
           </template>
         </el-table-column>
       </query>
     </div>
     <div v-show="dialogFormVisible" class="app-container">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="80px" style="width: 100%;">
+        <el-form-item :label="$t('table.terminal')">
+          <el-radio-group v-model="temp.is_mobile" size="small" class="filter-item">
+            <el-radio :label="1" border>{{ $t('table.mobile') }}</el-radio>
+            <el-radio :label="0" border>{{ $t('table.PC') }}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item :label="$t('table.description')">
+          <el-input v-model="temp.name"/>
+        </el-form-item>
+        <el-form-item :label="$t('table.photo')">
+          <uploadimg :imglist="imglist" @getimg="getImgurl"/>
+        </el-form-item>
+        <el-form-item :label="$t('table.sort')">
+          <el-input v-model="temp.sort" placeholder="数字越大越在前"/>
+        </el-form-item>
+        <el-form-item :label="$t('table.target')">
+          <el-input v-model="temp.target"/>
+        </el-form-item>
         <el-form-item :label="$t('table.type')">
-          <el-select v-model="temp.type" :placeholder="$t('table.status')" size="small" clearable>
-            <el-option v-for="item in typedata" :key="item.value" :label="item.label" :value="item.value"/>
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('table.title')">
-          <el-input v-model="temp.title" type="text"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.abstract')">
-          <el-input v-model="temp.abstract" type="text"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.content')">
-          <tinymce ref="tiny" :height="400" v-model="temp.content"/>
+          <el-radio-group v-model="temp.type" size="small" class="filter-item">
+            <el-radio label="user" border>用户</el-radio>
+            <el-radio label="url" border>链接</el-radio>
+            <el-radio label="article" border>文章</el-radio>
+            <el-radio label="activity" border>活动</el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <div class="filter-container">
@@ -54,51 +66,46 @@
 
 <script>
 import query from '@/components/queryTable'
-import Tinymce from '@/components/Tinymce'
+import uploadimg from '@/components/Upload/uploadImg'
 import waves from '@/directive/waves' // 水波纹指令
-const typedata = [
-  { value: 1, label: '通知公告' },
-  { value: 2, label: '资讯动态' }
-]
 
 export default {
-  name: 'InfoManage',
+  name: 'Banner',
   directives: {
     waves
   },
   components: {
     query,
-    Tinymce
-  },
-  filters: {
-    filterType(t) {
-      return typedata[t - 1].label
-    }
+    uploadimg
   },
   data() {
     return {
       tableKey: 0,
       list: null,
+      imglist: [],
+      api: {
+        add: '/banner',
+        edit: '/banner',
+        fetch: '/banner',
+        info: '/banner',
+        delete: '/banner'
+      },
       addloading: false,
       editloading: false,
-      api: {
-        add: '/notice',
-        edit: '/notice',
-        fetch: '/notice',
-        info: '/notice',
-        delete: '/notice'
-      },
       total: null,
       value4: '',
-      typedata: typedata,
-      listLoading: true,
+      listLoading: false,
       listQuery: {
         page: 1,
-        type: 1
+        is_mobile: 1
       },
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
-      temp: {},
+      temp: {
+        is_mobile: 1,
+        type: 'user',
+        image: ''
+      },
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -108,9 +115,7 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+        image: [{ required: true, trigger: 'change' }]
       },
       downloadLoading: false
     }
@@ -152,12 +157,16 @@ export default {
       this.$refs.querycomponent.handleFilter()
     },
     resetTemp() {
-      this.temp = {}
+      this.temp = {
+        is_mobile: 1,
+        type: 'user',
+        image: ''
+      }
     },
     handleCreate() {
       this.resetTemp()
-      this.$refs.tiny.setContent('')
       this.dialogStatus = 'create'
+      this.imglist = []
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
@@ -166,8 +175,17 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.listLoading = true
           this.addloading = true
-          this.$r.post(this.api.add, this.temp).then((re) => {
+          const tempData = Object.assign({}, this.temp)
+          var formData = new FormData()
+          for (var j in tempData) {
+            formData.append(j, tempData[j])
+          }
+          const config = {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          }
+          this.$r.post(this.api.edit, formData, config).then((re) => {
             if (re.data.status === 'success') {
               this.$refs.querycomponent.getList()
               this.dialogFormVisible = false
@@ -184,8 +202,10 @@ export default {
                 duration: 2000
               })
             }
+            this.listLoading = false
             this.addloading = false
           }).catch(errs => {
+            this.listLoading = false
             this.addloading = false
             console.log(errs)
           })
@@ -193,11 +213,14 @@ export default {
       })
     },
     handleUpdate(row) {
+      this.imglist = []
       this.$r.get(this.api.info + '/' + row).then(re => {
         if (re.data.status === 'success') {
           this.dialogStatus = 'update'
           this.temp = re.data.result
-          this.$refs.tiny.setContent(re.data.result.content || '')
+          if (re.data.result.image) {
+            this.imglist.push({ name: re.data.result.name, url: re.data.result.image })
+          }
           this.dialogFormVisible = true
           this.$nextTick(() => {
             this.$refs['dataForm'].clearValidate()
@@ -205,7 +228,7 @@ export default {
         } else {
           this.$notify.error({
             title: '失败',
-            message: re.data.msg
+            message: re.data.msg || '获取失败'
           })
         }
       }).catch(errs => console.log(errs))
@@ -213,27 +236,38 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.listLoading = true
           this.editloading = true
-          var tempData = Object.assign({}, this.temp)
-          this.$r.put(this.api.edit + '/' + tempData.notice_id, tempData).then((re) => {
+          const tempData = Object.assign({}, this.temp)
+          var formData = new FormData()
+          for (var j in tempData) {
+            formData.append(j, tempData[j])
+          }
+          const config = {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          }
+          this.$r.post(this.api.edit, formData, config).then((re) => {
+            console.log(re)
             if (re.data.status === 'success') {
               this.dialogFormVisible = false
               this.$refs.querycomponent.getList()
               this.$notify({
                 title: '成功',
-                message: '更新成功',
+                message: re.data.msg || '更新成功',
                 type: 'success',
                 duration: 2000
               })
             } else {
               this.$notify.error({
                 title: '失败',
-                message: '修改失败',
+                message: re.data.msg || '修改失败',
                 duration: 2000
               })
             }
+            this.listLoading = false
             this.editloading = false
           }).catch(errs => {
+            this.listLoading = false
             this.editloading = false
             console.log(errs)
           })
@@ -248,6 +282,9 @@ export default {
     },
     handleDownload() {
       this.$refs.querycomponent.handleDownload()
+    },
+    getImgurl(r) {
+      this.temp.image = r
     }
   }
 }

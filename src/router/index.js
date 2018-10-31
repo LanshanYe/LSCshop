@@ -221,6 +221,14 @@ export const asyncRouterMap = [
         meta: { title: 'resourcetype', roles: ['admin', 'resourcetype'] }
       },
       {
+        path: 'seriesmanage', //  系列管理
+        component: () => import('@/views/resourceManage/seriesManage'),
+        name: 'seriesmanage',
+        zhname: '系列管理',
+        promiss: 'seriesmanage',
+        meta: { title: 'seriesmanage', roles: ['admin', 'seriesmanage'] }
+      },
+      {
         path: 'bookresource', //  图书资源
         component: () => import('@/views/resourceManage/bookresource'),
         name: 'bookresource',

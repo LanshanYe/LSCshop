@@ -120,6 +120,8 @@ export default {
       list: null,
       total: null,
       value4: '',
+      addloading: false,
+      editloading: false,
       settledata: [
         { label: '已结算', value: 1 },
         { label: '未结算', value: 2 }
@@ -214,6 +216,7 @@ export default {
       console.log(this.api.add, this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.addloading = true
           this.$r.post(this.api.add, this.temp).then((re) => {
             if (re.data.status === 'success') {
               this.$refs.querycomponent.getList()
@@ -231,7 +234,11 @@ export default {
                 duration: 2000
               })
             }
-          }).catch(errs => { console.log(errs) })
+            this.addloading = false
+          }).catch(errs => {
+            this.addloading = false
+            console.log(errs)
+          })
         }
       })
     },
@@ -255,6 +262,7 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.editloading = true
           var tempData = Object.assign({}, this.temp)
           this.$r.post(this.api.edit, tempData).then((re) => {
             console.log(re)
@@ -274,7 +282,11 @@ export default {
                 duration: 2000
               })
             }
-          }).catch(errs => { console.log(errs) })
+            this.editloading = false
+          }).catch(errs => {
+            this.editloading = false
+            console.log(errs)
+          })
         }
       })
     },

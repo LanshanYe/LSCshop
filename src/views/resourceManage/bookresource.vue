@@ -2,22 +2,15 @@
   <div>
     <query ref="querycomponent" :list-query="listQuery" :dialog-width="'1000px'" :api="api">
       <div slot="queryFilter">
-        <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
+        <el-input :placeholder="$t('table.bookname')" v-model="listQuery.title" size="small" style="width: 200px;" clearable class="filter-item" @keyup.enter.native="handleFilter"/>
+        <el-input :placeholder="$t('table.author')" v-model="listQuery.author" size="small" style="width: 200px;" clearable class="filter-item" @keyup.enter.native="handleFilter"/>
+        <el-input v-model="listQuery.classno" :placeholder="$t('table.kinds')" size="small" style="width: 200px;" clearable class="filter-item" @keyup.enter.native="handleFilter"/>
+        <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       </div>
-      <el-table-column slot="tableColumn" :label="$t('table.name')" align="center" prop="real_name"/>
-      <el-table-column slot="tableColumn" :label="$t('table.title')" align="center" prop="title"/>
-      <el-table-column slot="tableColumn" :label="$t('table.photo')" align="center" width="150px">
-        <template slot-scope="scope">
-          <img :src="scope.row.images" style="width: 100%" alt="">
-        </template>
-      </el-table-column>
-      <el-table-column slot="tableColumn" :label="$t('table.abstract')" align="center" prop="abstract"/>
-      <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row.donate_id)">{{ $t('table.edit') }}</el-button>
-          <!--<el-button size="mini" type="danger" @click="handleModifyStatus(scope.row.donate_id)">{{ $t('table.delete') }}</el-button>-->
-        </template>
-      </el-table-column>
+      <el-table-column slot="tableColumn" :label="$t('table.bookname')" align="center" prop="title"/>
+      <el-table-column slot="tableColumn" :label="$t('table.author')" align="center" prop="author"/>
+      <el-table-column slot="tableColumn" :label="$t('table.press')" align="center" prop="publisher"/>
+      <el-table-column slot="tableColumn" :label="$t('table.kinds')" align="center" prop="classno"/>
     </query>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%" min-width="1200px">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="80px" style="width: 100%;">
@@ -36,8 +29,8 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button v-if="dialogStatus=='create'" :loading="addloading" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
-        <el-button v-else :loading="editloading" type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
+        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
+        <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -62,27 +55,26 @@ export default {
       tableKey: 0,
       list: null,
       total: null,
-      addloading: false,
-      editloading: false,
       value4: '',
       listLoading: true,
       api: {
-        fetch: '/donate',
-        add: '/donate-add',
-        info: '/donate_show',
-        edit: '/donate',
-        delete: '/donate'
+        fetch: '/interbook',
+        add: '/interbook',
+        info: '/interbook',
+        edit: '/interbook',
+        delete: '/interbook'
       },
       imgList: [],
       listQuery: {
         page: 1,
-        is_important: 1
+        rows: 10,
+        classno: '',
+        title: '',
+        author: ''
       },
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
-      temp: {
-        image: ''
-      },
+      temp: {},
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -110,9 +102,7 @@ export default {
       this.$refs.querycomponent.handleFilter()
     },
     resetTemp() {
-      this.temp = {
-        image: ''
-      }
+      this.temp = {}
     },
     handleCreate() {
       this.resetTemp()
@@ -124,10 +114,9 @@ export default {
       })
     },
     createData() {
+      console.log(this.api.add, this.temp)
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.addloading = true
-          this.listLoading = true
           this.temp.is_important = 1
           var formData = new FormData()
           for (var j in this.temp) {
@@ -154,13 +143,7 @@ export default {
                 duration: 2000
               })
             }
-            this.addloading = false
-            this.listLoading = false
-          }).catch(errs => {
-            this.addloading = false
-            this.listLoading = false
-            console.log(errs)
-          })
+          }).catch(errs => { console.log(errs) })
         }
       })
     },
@@ -193,7 +176,6 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.listLoading = true
-          this.editloading = true
           const tempData = Object.assign({}, this.temp)
           var formData = new FormData()
           for (var j in tempData) {
@@ -221,10 +203,8 @@ export default {
               })
             }
             this.listLoading = false
-            this.editloading = false
           }).catch(errs => {
             this.listLoading = false
-            this.editloading = false
             console.log(errs)
           })
         }
