@@ -13,9 +13,9 @@
         <el-tooltip :content="$t('navbar.screenfull')" effect="dark" placement="bottom">
           <screenfull class="screenfull right-menu-item"/>
         </el-tooltip>
-        <el-tooltip :content="$t('navbar.langs')" effect="dark" placement="bottom">
-          <lang-select class="international right-menu-item"/>
-        </el-tooltip>
+        <!--<el-tooltip :content="$t('navbar.langs')" effect="dark" placement="bottom">-->
+        <!--<lang-select class="international right-menu-item"/>-->
+        <!--</el-tooltip>-->
       </template>
 
       <el-dropdown class="avatar-container right-menu-item" placement="bottom">
@@ -55,15 +55,15 @@ import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
-import LangSelect from '@/components/LangSelect'
+// import LangSelect from '@/components/LangSelect'
 
 export default {
   components: {
     Breadcrumb,
     Hamburger,
     ErrorLog,
-    Screenfull,
-    LangSelect
+    Screenfull
+    // LangSelect
   },
   computed: {
     ...mapGetters([

@@ -10,7 +10,7 @@
     :on-remove="handleRemove"
     :on-exceed="handleExceed"
     :file-list="imglist"
-    :limit="1"
+    :limit="5"
     accept="image/*"
     list-type="picture-card"
     class="avatar-uploader"

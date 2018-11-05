@@ -1,29 +1,29 @@
 <template>
   <div class="dashboard-editor-container">
 
-    <panel-group :data="indexdata" @handleSetLineChartData="handleSetLineChartData"/>
+    <!--<panel-group :data="indexdata" @handleSetLineChartData="handleSetLineChartData"/>-->
 
-    <!--<el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">-->
-    <!--<line-chart :chart-data="lineChartData"/>-->
+    <!--&lt;!&ndash;<el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">&ndash;&gt;-->
+    <!--&lt;!&ndash;<line-chart :chart-data="lineChartData"/>&ndash;&gt;-->
+    <!--&lt;!&ndash;</el-row>&ndash;&gt;-->
+
+    <!--<el-row :gutter="32">-->
+    <!--&lt;!&ndash;<el-col :xs="24" :sm="24" :lg="8">&ndash;&gt;-->
+    <!--&lt;!&ndash;<div class="chart-wrapper">&ndash;&gt;-->
+    <!--&lt;!&ndash;<raddar-chart/>&ndash;&gt;-->
+    <!--&lt;!&ndash;</div>&ndash;&gt;-->
+    <!--&lt;!&ndash;</el-col>&ndash;&gt;-->
+    <!--&lt;!&ndash;<el-col :xs="24" :sm="24" :lg="8">&ndash;&gt;-->
+    <!--&lt;!&ndash;<div class="chart-wrapper">&ndash;&gt;-->
+    <!--&lt;!&ndash;<pie-chart/>&ndash;&gt;-->
+    <!--&lt;!&ndash;</div>&ndash;&gt;-->
+    <!--&lt;!&ndash;</el-col>&ndash;&gt;-->
+    <!--<el-col :xs="24" :sm="24" :lg="24">-->
+    <!--<div class="chart-wrapper">-->
+    <!--<bar-chart :data="bardata"/>-->
+    <!--</div>-->
+    <!--</el-col>-->
     <!--</el-row>-->
-
-    <el-row :gutter="32">
-      <!--<el-col :xs="24" :sm="24" :lg="8">-->
-      <!--<div class="chart-wrapper">-->
-      <!--<raddar-chart/>-->
-      <!--</div>-->
-      <!--</el-col>-->
-      <!--<el-col :xs="24" :sm="24" :lg="8">-->
-      <!--<div class="chart-wrapper">-->
-      <!--<pie-chart/>-->
-      <!--</div>-->
-      <!--</el-col>-->
-      <el-col :xs="24" :sm="24" :lg="24">
-        <div class="chart-wrapper">
-          <bar-chart :data="bardata"/>
-        </div>
-      </el-col>
-    </el-row>
 
   </div>
 </template>
@@ -71,21 +71,21 @@ export default {
     }
   },
   created() {
-    this.$r.get('/index').then(re => {
-      this.indexdata = re.data.result
-      var arr = []
-      var arr2 = []
-      re.data.result.todayBorrowRank.rows.forEach(v => {
-        arr.push(v.title)
-        arr2.push(v.totalNum)
-      })
-      this.bardata = {
-        titledata: arr,
-        datas: arr2,
-        titles: '今日借出书籍排行榜',
-        color: '#40c9c6'
-      }
-    }).catch(errs => { console.log(errs) })
+    // this.$r.get('/index').then(re => {
+    //   this.indexdata = re.data.result
+    //   var arr = []
+    //   var arr2 = []
+    //   re.data.result.todayBorrowRank.rows.forEach(v => {
+    //     arr.push(v.title)
+    //     arr2.push(v.totalNum)
+    //   })
+    //   this.bardata = {
+    //     titledata: arr,
+    //     datas: arr2,
+    //     titles: '今日借出书籍排行榜',
+    //     color: '#40c9c6'
+    //   }
+    // }).catch(errs => { console.log(errs) })
   },
   methods: {
     handleSetLineChartData(type) {

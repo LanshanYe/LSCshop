@@ -12,7 +12,8 @@ module.exports = {
     proxyTable: {
       '/api': {
         // target: 'http://taoyuan.ydxxtech.com/admin',
-        target: 'https://tytsg.cn/admin',
+        // target: 'https://tytsg.cn/admin',
+        target: 'http://lianshangche.ydxxtech.com/admin',
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''

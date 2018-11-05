@@ -4,7 +4,7 @@
 
       <div class="title-container">
         <h3 class="title">{{ $t('login.title') }}</h3>
-        <lang-select class="set-language"/>
+        <!--<lang-select class="set-language"/>-->
       </div>
 
       <el-form-item prop="username">
@@ -42,11 +42,11 @@
 </template>
 
 <script>
-import LangSelect from '@/components/LangSelect'
+// import LangSelect from '@/components/LangSelect'
 
 export default {
   name: 'Login',
-  components: { LangSelect },
+  // components: { LangSelect },
   data() {
     const validateUsername = (rule, value, callback) => {
       if (value === '' || value === undefined || value === null) {
@@ -67,7 +67,6 @@ export default {
         username: '',
         password: ''
       },
-      bgimage: 'http://taoyuan.ydxxtech.com/images/service/201809255ba9fbd9d2d70.png',
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]

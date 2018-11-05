@@ -4,19 +4,13 @@ import { getToken } from '@/utils/auth'
 
 const url = window.location.href.split('#')[0]
 let apiUrl = ''
-if (url.indexOf('taoyuan.ydxxtech.com') !== -1) {
-  apiUrl = 'http://taoyuan.ydxxtech.com/admin'
-} else if (url.indexOf('tytsg.cn') !== -1) {
-  if (url.indexOf('www') !== -1) {
-    apiUrl = 'https://www.tytsg.cn/admin'
-  } else {
-    apiUrl = 'https://tytsg.cn/admin'
-  }
+if (url.indexOf('lianshangche.ydxxtech.com') !== -1) {
+  apiUrl = 'http://lianshangche.ydxxtech.com/admin'
 } else {
   apiUrl = '/api'
 }
 if (apiUrl === '/api') {
-  store.dispatch('setUrl', 'https://tytsg.cn/admin')
+  store.dispatch('setUrl', 'http://lianshangche.ydxxtech.com/admin')
 } else {
   store.dispatch('setUrl', apiUrl)
 }

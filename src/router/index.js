@@ -115,175 +115,245 @@ export const asyncRouterMap = [
   //     }
   //   ]
   // },
+  // {
+  //   path: '/documentation', // 读者管理
+  //   component: Layout,
+  //   redirect: '/documentation/index',
+  //   zhname: '读者管理',
+  //   promiss: 'readManage',
+  //   meta: { title: 'documentation', icon: 'documentation', roles: ['admin', 'readManage'] },
+  //   children: [
+  //     {
+  //       path: 'index', // 借书管理
+  //       component: () => import('@/views/documentation/index'),
+  //       name: 'Documentation',
+  //       zhname: '借书管理',
+  //       promiss: 'readManage-borrow',
+  //       meta: { title: 'borrowBook', roles: ['admin', 'readManage-borrow'] }
+  //     },
+  //     {
+  //       path: 'Rcard', // 读者列表
+  //       component: () => import('@/views/documentation/Rcard'),
+  //       name: 'Rcard',
+  //       zhname: '读者列表',
+  //       promiss: 'readManage-card',
+  //       meta: { title: 'rcard', roles: ['admin', 'readManage-card'] }
+  //     },
+  //     // {
+  //     //   path: 'readerManage', // 读者管理
+  //     //   component: () => import('@/views/documentation/Rcard'),
+  //     //   name: 'readerManage',
+  //     //   zhname: '读者管理',
+  //     //   promiss: 'readManage-readerManage',
+  //     //   meta: { title: 'readerManage', icon: 'documentation', roles: ['admin', 'readManage-readerManage'] }
+  //     // },
+  //     {
+  //       path: 'Ractive', // 活动管理
+  //       component: () => import('@/views/documentation/Ractive'),
+  //       name: 'Ractive',
+  //       zhname: '活动管理',
+  //       promiss: 'readManage-active',
+  //       meta: { title: 'ractive', noCache: true, roles: ['admin', 'readManage-active'] }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/guide', // 捐赠管理
+  //   component: Layout,
+  //   redirect: '/guide/index',
+  //   zhname: '捐赠管理',
+  //   promiss: 'donationManage',
+  //   meta: {
+  //     title: 'guide', icon: 'guide',
+  //     roles: ['admin', 'donationManage'] // you can set roles in root nav
+  //   },
+  //   children: [
+  //     {
+  //       path: 'index', //  捐赠文档管理
+  //       component: () => import('@/views/guide/index'),
+  //       name: 'Guide',
+  //       zhname: '捐赠文档管理',
+  //       promiss: 'donationManage-doc',
+  //       meta: { title: 'donationDoc', roles: ['admin', 'donationManage-doc'] }
+  //     },
+  //     {
+  //       path: 'donationList', //  捐赠图书列表
+  //       component: () => import('@/views/guide/donationList'),
+  //       name: 'DonationList',
+  //       zhname: '捐赠图书列表',
+  //       promiss: 'donationManage-booklist',
+  //       meta: { title: 'donationList', roles: ['admin', 'donationManage-booklist'] }
+  //     },
+  //     {
+  //       path: 'mainDonation', //  重要捐赠管理
+  //       component: () => import('@/views/guide/mainDonation'),
+  //       name: 'MainDonation',
+  //       zhname: '重要捐赠管理',
+  //       promiss: 'donationManage-mainbook',
+  //       meta: { title: 'mainDonation', roles: ['admin', 'donationManage-mainbook'] }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/resource', // 资源管理
+  //   component: Layout,
+  //   zhname: '资源管理',
+  //   promiss: 'resource',
+  //   meta: {
+  //     title: 'resource', icon: 'example',
+  //     roles: ['admin', 'resource']
+  //   },
+  //   children: [
+  //     {
+  //       path: 'index', // 资源管理
+  //       zhname: '资源管理',
+  //       promiss: 'resourceindex',
+  //       component: () => import('@/views/resourceManage/resource'),
+  //       name: 'resource',
+  //       meta: { title: 'resource', roles: ['admin', 'resourceindex'] }
+  //     },
+  //     {
+  //       path: 'resourcetype', //  资源类型管理
+  //       component: () => import('@/views/resourceManage/resourcetype'),
+  //       name: 'resourcetype',
+  //       zhname: '资源类型管理',
+  //       promiss: 'resourcetype',
+  //       meta: { title: 'resourcetype', roles: ['admin', 'resourcetype'] }
+  //     },
+  //     {
+  //       path: 'seriesmanage', //  系列管理
+  //       component: () => import('@/views/resourceManage/seriesManage'),
+  //       name: 'seriesmanage',
+  //       zhname: '系列管理',
+  //       promiss: 'seriesmanage',
+  //       meta: { title: 'seriesmanage', roles: ['admin', 'seriesmanage'] }
+  //     },
+  //     {
+  //       path: 'bookresource', //  图书资源
+  //       component: () => import('@/views/resourceManage/bookresource'),
+  //       name: 'bookresource',
+  //       zhname: '图书资源',
+  //       promiss: 'bookresource',
+  //       meta: { title: 'bookresource', roles: ['admin', 'bookresource'] }
+  //     }
+  //   ]
+  // },
   {
-    path: '/documentation', // 读者管理
+    path: '/carManage', // 汽车管理
     component: Layout,
-    redirect: '/documentation/index',
-    zhname: '读者管理',
-    promiss: 'readManage',
-    meta: { title: 'documentation', icon: 'documentation', roles: ['admin', 'readManage'] },
-    children: [
-      {
-        path: 'index', // 借书管理
-        component: () => import('@/views/documentation/index'),
-        name: 'Documentation',
-        zhname: '借书管理',
-        promiss: 'readManage-borrow',
-        meta: { title: 'borrowBook', roles: ['admin', 'readManage-borrow'] }
-      },
-      {
-        path: 'Rcard', // 读者列表
-        component: () => import('@/views/documentation/Rcard'),
-        name: 'Rcard',
-        zhname: '读者列表',
-        promiss: 'readManage-card',
-        meta: { title: 'rcard', roles: ['admin', 'readManage-card'] }
-      },
-      // {
-      //   path: 'readerManage', // 读者管理
-      //   component: () => import('@/views/documentation/Rcard'),
-      //   name: 'readerManage',
-      //   zhname: '读者管理',
-      //   promiss: 'readManage-readerManage',
-      //   meta: { title: 'readerManage', icon: 'documentation', roles: ['admin', 'readManage-readerManage'] }
-      // },
-      {
-        path: 'Ractive', // 活动管理
-        component: () => import('@/views/documentation/Ractive'),
-        name: 'Ractive',
-        zhname: '活动管理',
-        promiss: 'readManage-active',
-        meta: { title: 'ractive', noCache: true, roles: ['admin', 'readManage-active'] }
-      }
-    ]
-  },
-  {
-    path: '/guide', // 捐赠管理
-    component: Layout,
-    redirect: '/guide/index',
-    zhname: '捐赠管理',
-    promiss: 'donationManage',
-    meta: {
-      title: 'guide', icon: 'guide',
-      roles: ['admin', 'donationManage'] // you can set roles in root nav
-    },
-    children: [
-      {
-        path: 'index', //  捐赠文档管理
-        component: () => import('@/views/guide/index'),
-        name: 'Guide',
-        zhname: '捐赠文档管理',
-        promiss: 'donationManage-doc',
-        meta: { title: 'donationDoc', roles: ['admin', 'donationManage-doc'] }
-      },
-      {
-        path: 'donationList', //  捐赠图书列表
-        component: () => import('@/views/guide/donationList'),
-        name: 'DonationList',
-        zhname: '捐赠图书列表',
-        promiss: 'donationManage-booklist',
-        meta: { title: 'donationList', roles: ['admin', 'donationManage-booklist'] }
-      },
-      {
-        path: 'mainDonation', //  重要捐赠管理
-        component: () => import('@/views/guide/mainDonation'),
-        name: 'MainDonation',
-        zhname: '重要捐赠管理',
-        promiss: 'donationManage-mainbook',
-        meta: { title: 'mainDonation', roles: ['admin', 'donationManage-mainbook'] }
-      }
-    ]
-  },
-  {
-    path: '/resource', // 资源管理
-    component: Layout,
-    zhname: '资源管理',
-    promiss: 'resource',
-    meta: {
-      title: 'resource', icon: 'example',
-      roles: ['admin', 'resource']
-    },
-    children: [
-      {
-        path: 'index', // 资源管理
-        zhname: '资源管理',
-        promiss: 'resourceindex',
-        component: () => import('@/views/resourceManage/resource'),
-        name: 'resource',
-        meta: { title: 'resource', roles: ['admin', 'resourceindex'] }
-      },
-      {
-        path: 'resourcetype', //  资源类型管理
-        component: () => import('@/views/resourceManage/resourcetype'),
-        name: 'resourcetype',
-        zhname: '资源类型管理',
-        promiss: 'resourcetype',
-        meta: { title: 'resourcetype', roles: ['admin', 'resourcetype'] }
-      },
-      {
-        path: 'seriesmanage', //  系列管理
-        component: () => import('@/views/resourceManage/seriesManage'),
-        name: 'seriesmanage',
-        zhname: '系列管理',
-        promiss: 'seriesmanage',
-        meta: { title: 'seriesmanage', roles: ['admin', 'seriesmanage'] }
-      },
-      {
-        path: 'bookresource', //  图书资源
-        component: () => import('@/views/resourceManage/bookresource'),
-        name: 'bookresource',
-        zhname: '图书资源',
-        promiss: 'bookresource',
-        meta: { title: 'bookresource', roles: ['admin', 'bookresource'] }
-      }
-    ]
-  },
-  {
-    path: '/infoManage', // 资讯管理
-    component: Layout,
-    zhname: '资讯管理',
-    promiss: 'infoManage',
-    meta: { title: 'icons', icon: 'icon', roles: ['admin', 'infoManage'] },
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/infoManage/infoManage'),
-        name: 'InfoManage',
-        meta: { title: 'icons', roles: ['admin', 'infoManage'] }
-      }
-    ]
-  },
-  {
-    path: '/banner', // 轮播图管理
-    component: Layout,
-    zhname: '轮播图管理',
-    promiss: 'banner',
-    meta: { title: 'banner', icon: 'list', roles: ['admin', 'banner'] },
+    zhname: '汽车管理',
+    promiss: 'carManage',
+    meta: { title: 'icons', icon: 'icon', roles: ['admin', 'carManage'] },
     children: [
       {
         path: 'index',
-        component: () => import('@/views/banner/banner'),
-        name: 'banner',
-        meta: { title: 'banner', roles: ['admin', 'banner'] }
+        component: () => import('@/views/carManage/carManage'),
+        name: 'carManage',
+        meta: { title: 'icons', roles: ['admin', 'carManage'] }
+      }
+    ]
+  },
+  {
+    path: '/goodsManage', // 商品管理
+    component: Layout,
+    zhname: '商品管理',
+    promiss: 'goodsManage',
+    meta: { title: 'goods', icon: 'example', roles: ['admin', 'goodsManage'] },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/goodsManage/goodsManage'),
+        name: 'goodsManage',
+        meta: { title: 'goods', roles: ['admin', 'goodsManage'] }
+      }
+    ]
+  },
+  {
+    path: '/goodsCategory', // 商品分类管理
+    component: Layout,
+    zhname: '商品分类管理',
+    promiss: 'goodsCategory',
+    meta: { title: 'goodscate', icon: 'link', roles: ['admin', 'goodsCategory'] },
+    children: [
+      {
+        path: 'index', // 系统分类
+        zhname: '系统分类',
+        promiss: 'cate-index',
+        component: () => import('@/views/goodsManage/goodsCategory'),
+        name: 'goodsCategory',
+        meta: { title: 'goodscate', roles: ['admin', 'cate-index'] }
+      },
+      {
+        path: 'shop_cate', // 店铺分类
+        component: () => import('@/views/goodsManage/shopCategory'),
+        name: 'shop_cate',
+        zhname: '店铺分类',
+        promiss: 'shop-cate',
+        meta: { title: 'shopcate', noCache: true, roles: ['admin', 'shop-cate'] }
+      }
+    ]
+  },
+  {
+    path: '/collage', // 拼团管理
+    component: Layout,
+    zhname: '拼团管理',
+    promiss: 'collage',
+    meta: { title: 'collage', icon: 'component', roles: ['admin', 'collage'] },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/collage/collage'),
+        name: 'collage',
+        meta: { title: 'collage', roles: ['admin', 'collage'] }
+      }
+    ]
+  },
+  {
+    path: '/userManage', // 会员管理
+    component: Layout,
+    zhname: '会员管理',
+    promiss: 'userManage',
+    meta: { title: 'banner', icon: 'peoples', roles: ['admin', 'userManage'] },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/userManage/userManage'),
+        name: 'userManage',
+        meta: { title: 'banner', roles: ['admin', 'userManage'] }
+      }
+    ]
+  },
+  {
+    path: '/shop', // 商户管理
+    component: Layout,
+    zhname: '商户管理',
+    promiss: 'shop',
+    meta: { title: 'shop', icon: 'table', roles: ['admin', 'shop'] },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/shop/shop'),
+        name: 'shop',
+        meta: { title: 'shop', roles: ['admin', 'shop'] }
       }
     ]
   },
 
-  {
-    path: '/tab', // 服务指南
-    component: Layout,
-    zhname: '服务指南',
-    promiss: 'service',
-    meta: { title: 'serviceList', icon: 'tab', roles: ['admin', 'service'] },
-    children: [
-      {
-        path: 'serviceList', // 服务指南
-        component: () => import('@/views/tab/serviceList'),
-        name: 'ServiceList',
-        meta: { title: 'serviceList', roles: ['admin', 'service'] }
-      }
-    ]
-  },
+  // {
+  //   path: '/tab', // 服务指南
+  //   component: Layout,
+  //   zhname: '服务指南',
+  //   promiss: 'service',
+  //   meta: { title: 'serviceList', icon: 'tab', roles: ['admin', 'service'] },
+  //   children: [
+  //     {
+  //       path: 'serviceList', // 服务指南
+  //       component: () => import('@/views/tab/serviceList'),
+  //       name: 'ServiceList',
+  //       meta: { title: 'serviceList', roles: ['admin', 'service'] }
+  //     }
+  //   ]
+  // },
   /** When your routing table is too long, you can split it into small modules**/
   //  componentsRouter,
   //  chartsRouter,
@@ -474,48 +544,48 @@ export const asyncRouterMap = [
     ]
   },
 
-  {
-    path: '/clipboard', // 你读书我买单管理
-    component: Layout,
-    zhname: '你读书我买单管理',
-    redirect: 'noredirect',
-    promiss: 'ureadManage',
-    meta: { icon: 'clipboard', roles: ['admin', 'ureadManage'] },
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/clipboard/index'),
-        name: 'ClipboardDemo',
-        meta: { title: 'clipboardDemo', roles: ['admin', 'ureadManage'] }
-      }
-    ]
-  },
-
-  {
-    path: '/passenger', // 客流管理
-    component: Layout,
-    zhname: '客流管理',
-    promiss: 'passenger',
-    meta: { title: 'passenger', icon: 'peoples', roles: ['admin', 'passenger'] },
-    children: [
-      {
-        path: 'passengerequipment', // 客流设备管理
-        component: () => import('@/views/passenger/passengerequipment'),
-        name: 'passengerEquipment',
-        promiss: 'passenger-equipment',
-        zhname: '客流设备管理',
-        meta: { title: 'passengerEquipment', roles: ['admin', 'passenger-equipment'] }
-      },
-      {
-        path: 'passengerdata', // 客流数据管理
-        component: () => import('@/views/passenger/passengerdata'),
-        name: 'passengerData',
-        promiss: 'passenger-data',
-        zhname: '客流数据管理',
-        meta: { title: 'passengerData', roles: ['admin', 'passenger-data'] }
-      }
-    ]
-  },
+  // {
+  //   path: '/clipboard', // 你读书我买单管理
+  //   component: Layout,
+  //   zhname: '你读书我买单管理',
+  //   redirect: 'noredirect',
+  //   promiss: 'ureadManage',
+  //   meta: { icon: 'clipboard', roles: ['admin', 'ureadManage'] },
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/clipboard/index'),
+  //       name: 'ClipboardDemo',
+  //       meta: { title: 'clipboardDemo', roles: ['admin', 'ureadManage'] }
+  //     }
+  //   ]
+  // },
+  //
+  // {
+  //   path: '/passenger', // 客流管理
+  //   component: Layout,
+  //   zhname: '客流管理',
+  //   promiss: 'passenger',
+  //   meta: { title: 'passenger', icon: 'peoples', roles: ['admin', 'passenger'] },
+  //   children: [
+  //     {
+  //       path: 'passengerequipment', // 客流设备管理
+  //       component: () => import('@/views/passenger/passengerequipment'),
+  //       name: 'passengerEquipment',
+  //       promiss: 'passenger-equipment',
+  //       zhname: '客流设备管理',
+  //       meta: { title: 'passengerEquipment', roles: ['admin', 'passenger-equipment'] }
+  //     },
+  //     {
+  //       path: 'passengerdata', // 客流数据管理
+  //       component: () => import('@/views/passenger/passengerdata'),
+  //       name: 'passengerData',
+  //       promiss: 'passenger-data',
+  //       zhname: '客流数据管理',
+  //       meta: { title: 'passengerData', roles: ['admin', 'passenger-data'] }
+  //     }
+  //   ]
+  // },
 
   // {
   //   path: 'external-link',
