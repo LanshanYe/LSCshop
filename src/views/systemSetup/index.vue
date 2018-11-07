@@ -8,7 +8,6 @@
           </el-select>
           <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
           <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
-          <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-download" @click="downloadVideo">{{ $t('table.downloadVideo') }}</el-button>
         </div>
         <el-table-column slot="tableColumn" :label="$t('table.showName')" prop="display_name" align="center"/>
         <el-table-column slot="tableColumn" :label="$t('table.configdescript')" prop="value" align="center">

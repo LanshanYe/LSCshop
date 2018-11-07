@@ -3,6 +3,7 @@
     <div v-show="!dialogFormVisible">
       <query ref="querycomponent" :list-query="listQuery" :api="api">
         <div slot="queryFilter">
+          <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
           <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
         </div>
         <el-table-column slot="tableColumn" :label="$t('table.photo')" width="200" prop="car_name" align="center">
@@ -10,8 +11,8 @@
             <img :src="scope.row.cover || ''" style="width: 100%;" >
           </template>
         </el-table-column>
-        <el-table-column slot="tableColumn" :label="$t('table.car_name')" prop="car_name" align="center"/>
-        <el-table-column slot="tableColumn" :label="$t('table.price')" prop="price" align="center"/>
+        <el-table-column slot="tableColumn" :label="$t('table.title')" prop="title" align="center"/>
+        <el-table-column slot="tableColumn" :label="$t('table.guidance_price')" prop="guide_price" align="center"/>
         <el-table-column slot="tableColumn" :label="$t('table.releaseDate')" prop="created_at" align="center"/>
         <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
           <template slot-scope="scope">
@@ -26,18 +27,25 @@
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="120px" style="width: 100%;">
         <el-row :gutter="40">
           <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item :label="$t('table.car_name')" prop="car_name">
-              <el-input v-model="temp.car_name" type="text"/>
+            <el-form-item label="标题" prop="title">
+              <el-input v-model="temp.title" clearable/>
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item :label="$t('table.price')" prop="price">
-              <el-input v-model="temp.price" type="text"/>
+            <el-form-item label="车型" prop="model_id">
+              <el-select v-model="temp.model_id" clearable class="width100">
+                <el-option v-for="item in configdata.model" :key="item.id" :label="item.name" :value="item.id"/>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="车龄" prop="car_age">
-              <el-input v-model="temp.car_age" type="text"/>
+            <el-form-item label="座位数" prop="pedestal">
+              <el-select v-model="temp.pedestal" clearable class="width100">
+                <el-option :value="2" label="2"/>
+                <el-option :value="4" label="4"/>
+                <el-option :value="5" label="5"/>
+                <el-option :value="7" label="7"/>
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -57,52 +65,30 @@
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="车型" prop="model_id">
-              <el-select v-model="temp.model_id" filterable clearable class="width100">
-                <el-option v-for="item in configdata.model" :key="item.id" :label="item.name" :value="item.id"/>
-              </el-select>
+            <el-form-item label="指导价" prop="guide_price">
+              <el-input v-model="temp.guide_price" type="text" clearable/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="40">
           <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="变速箱" prop="transmission_case">
-              <el-select v-model="temp.transmission_case" filterable clearable class="width100">
-                <el-option v-for="item in configdata.transmission_case" :key="item.id" :label="item.name" :value="item.id"/>
+            <el-form-item label="变速箱" prop="transmission">
+              <el-select v-model="temp.transmission" filterable clearable class="width100">
+                <el-option :value="0" label="不限"/>
+                <el-option :value="1" label="手动"/>
+                <el-option :value="2" label="自动"/>
+                <el-option :value="3" label="半自动"/>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="里程" prop="mileage">
-              <el-input v-model="temp.mileage" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="排量" prop="displacement">
+            <el-form-item label="排量(L)" prop="displacement">
               <el-input v-model="temp.displacement" type="text" clearable/>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row :gutter="40">
           <el-col :xs="24" :sm="12" :lg="8">
             <el-form-item label="发动机">
-              <el-select v-model="temp.engine" filterable clearable class="width100">
-                <el-option v-for="item in configdata.engine" :key="item.id" :label="item.name" :value="item.id"/>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="排放标准" prop="emission_standard">
-              <el-select v-model="temp.emission_standard" filterable clearable class="width100">
-                <el-option v-for="item in configdata.emission_standard" :key="item.id" :label="item.name" :value="item.id"/>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="颜色" prop="color">
-              <el-select v-model="temp.color" filterable clearable class="width100">
-                <el-option v-for="item in configdata.color" :key="item.id" :label="item.name" :value="item.id"/>
-              </el-select>
+              <el-input v-model="temp.engine" type="text" clearable/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -110,143 +96,39 @@
           <el-col :xs="24" :sm="12" :lg="8">
             <el-form-item label="燃料类型" prop="fuel_type">
               <el-select v-model="temp.fuel_type" filterable clearable class="width100">
-                <el-option v-for="item in configdata.fuel_type" :key="item.id" :label="item.name" :value="item.id"/>
+                <el-option :value="0" label="其他"/>
+                <el-option :value="1" label="汽油"/>
+                <el-option :value="2" label="柴油"/>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="厂商类型" prop="vendor_type">
-              <el-select v-model="temp.vendor_type" filterable clearable class="width100">
-                <el-option v-for="item in configdata.vendor_type" :key="item.id" :label="item.name" :value="item.id"/>
+            <el-form-item label="环保标准">
+              <el-select v-model="temp.emission_standard" filterable clearable class="width100">
+                <el-option value="g4" label="国4"/>
+                <el-option value="g5" label="国5"/>
+                <el-option value="g6" label="国6"/>
+                <el-option value="g0" label="其他"/>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="座位数" prop="pedestal">
-              <el-input v-model="temp.pedestal" type="text" clearable/>
+            <el-form-item label="推荐指数">
+              <el-radio v-model="temp.is_recommend" :label="0" border>不推荐</el-radio>
+              <el-radio v-model="temp.is_recommend" :label="1" border>推荐</el-radio>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="40">
           <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="国别">
-              <el-select v-model="temp.countries" filterable clearable class="width100">
-                <el-option v-for="item in configdata.countries" :key="item.id" :label="item.name" :value="item.id"/>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="推荐指数" prop="is_recommed">
-              <el-radio v-model="temp.is_recommed" :label="0" border>不推荐</el-radio>
-              <el-radio v-model="temp.is_recommed" :label="1" border>推荐</el-radio>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="驱动" prop="drive">
-              <el-select v-model="temp.drive" filterable clearable class="width100">
-                <el-option v-for="item in configdata.drive" :key="item.id" :label="item.name" :value="item.id"/>
+            <el-form-item label="颜色" prop="color">
+              <el-select v-model="temp.color" clearable class="width100">
+                <el-option v-for="item in configdata.color" :key="item.id" :label="item.name" :value="item.id"/>
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row :gutter="40">
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="首付" prop="down_payments">
-              <el-input v-model="temp.down_payments" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="月供" prop="monthly_supply">
-              <el-input v-model="temp.monthly_supply" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="指导价" prop="guidance_price">
-              <el-input v-model="temp.guidance_price" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="40">
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="级别">
-              <el-input v-model="temp.level" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="长宽高">
-              <el-input v-model="temp.lwh" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="车身结构">
-              <el-input v-model="temp.structure" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="40">
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="最高车速">
-              <el-input v-model="temp.max_speed" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="官方百公里加速">
-              <el-input v-model="temp.official_acceleration" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="实测百公里加速">
-              <el-input v-model="temp.measured_acceleration" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="40">
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="制动">
-              <el-input v-model="temp.braking" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="油耗">
-              <el-input v-model="temp.oil_consumption" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="工信部综合油耗">
-              <el-input v-model="temp.official_oil" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="40">
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="离地间隙">
-              <el-input v-model="temp.off_ground" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="质保">
-              <el-input v-model="temp.quality_assurance" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="变速箱描述">
-              <el-input v-model="temp.transmission_case_mark" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="40">
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="发动机描述">
-              <el-input v-model="temp.engine_mark" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="商户ID">
-              <el-input v-model="temp.shop_id" type="text" clearable/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item :label="$t('table.photo')">
+        <el-form-item label="汽车封面图">
           <el-upload
             :show-file-list="false"
             :headers="usertoken"
@@ -254,13 +136,14 @@
             :before-upload="handleAvatarbeforeupload"
             :on-error="handleAvatarError"
             name="image"
-            action="http://lianshangche.ydxxtech.com/admin/uploadImages"
+            action="http://lianshangche.ydxxtech.com/admin/uploadImages/car_cover"
             class="avatar-uploader">
+            <div slot="tip" class="el-upload__tip">（请上传车辆左前45度的封面图）</div>
             <img v-if="temp.cover" :src="temp.cover.indexOf('http://phi8e7fdq.bkt.clouddn.com/') >= 0?temp.cover:'http://phi8e7fdq.bkt.clouddn.com/' + temp.cover" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"/>
           </el-upload>
         </el-form-item>
-        <el-form-item label="汽车轮播图">
+        <el-form-item label="汽车详情轮播图">
           <el-upload
             :headers="usertoken"
             :on-success="handleAvatarSuccess3"
@@ -269,7 +152,7 @@
             :on-remove="handleRemove"
             :limit="5"
             :file-list="imglists"
-            action="http://lianshangche.ydxxtech.com/admin/uploadImages"
+            action="http://lianshangche.ydxxtech.com/admin/uploadImages/car_image"
             list-type="picture-card"
             name="image">
             <i class="el-icon-plus"/>
@@ -327,8 +210,15 @@ export default {
       temp: {
         series_id: '',
         brand_id: '',
+        shop_id: 1,
         cover: '',
-        is_recommed: 0
+        is_recommend: 0,
+        model_id: 5,
+        pedestal: 5,
+        fuel_type: 1,
+        emission_standard: 'g4',
+        transmission: 0,
+        color: 2
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -339,12 +229,12 @@ export default {
       dialogPvVisible: false,
       configdata: {},
       rules: {
-        car_name: [{ required: true, message: '此项为必填项', trigger: 'blur' }],
+        title: [{ required: true, message: '此项为必填项', trigger: 'blur' }],
         brand_id: [{ required: true, message: '此项为必填项', trigger: 'change' }],
         series_id: [{ required: true, message: '此项为必填项', trigger: 'change' }],
         price: [{ required: true, message: '此项为必填项', trigger: 'blur' }],
         model_id: [{ required: true, message: '此项为必填项', trigger: 'change' }],
-        transmission_case: [{ required: true, message: '此项为必填项', trigger: 'blur' }],
+        transmission: [{ required: true, message: '此项为必填项', trigger: 'change' }],
         car_age: [{ required: true, message: '此项为必填项', trigger: 'blur' }],
         mileage: [{ required: true, message: '此项为必填项', trigger: 'blur' }],
         displacement: [{ required: true, message: '此项为必填项', trigger: 'blur' }],
@@ -353,12 +243,12 @@ export default {
         color: [{ required: true, message: '此项为必填项', trigger: 'change' }],
         fuel_type: [{ required: true, message: '此项为必填项', trigger: 'change' }],
         vendor_type: [{ required: true, message: '此项为必填项', trigger: 'change' }],
-        pedestal: [{ required: true, message: '此项为必填项', trigger: 'blur' }],
+        pedestal: [{ required: true, message: '此项为必填项', trigger: 'change' }],
         is_recommed: [{ required: true, message: '此项为必填项', trigger: 'change' }],
         drive: [{ required: true, message: '此项为必填项', trigger: 'change' }],
         down_payments: [{ required: true, message: '此项为必填项', trigger: 'blur' }],
         monthly_supply: [{ required: true, message: '此项为必填项', trigger: 'blur' }],
-        guidance_price: [{ required: true, message: '此项为必填项', trigger: 'blur' }]
+        guide_price: [{ required: true, message: '此项为必填项', trigger: 'blur' }]
       },
       downloadLoading: false
     }
@@ -390,7 +280,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$r.delete(this.api.delete + '/' + id).then((re) => {
+        this.$r.post(this.api.delete, { _method: 'delete', ids: id }).then((re) => {
           if (re.data.status === 'success') {
             this.$refs.querycomponent.getList()
             this.$notify({
@@ -402,7 +292,7 @@ export default {
           } else {
             this.$notify.error({
               title: '失败',
-              message: '删除失败'
+              message: re.data.msg
             })
           }
         }).catch(errs => console.log(errs))
@@ -420,12 +310,20 @@ export default {
       this.temp = {
         series_id: '',
         brand_id: '',
+        shop_id: 1,
         cover: '',
-        is_recommed: 0
+        is_recommend: 0,
+        model_id: 5,
+        pedestal: 5,
+        color: 2,
+        fuel_type: 1,
+        emission_standard: 'g4',
+        transmission: 0
       }
     },
     handleCreate() {
       this.resetTemp()
+      this.imglists = []
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -449,7 +347,7 @@ export default {
             } else {
               this.$notify.error({
                 title: '失败',
-                message: '创建失败',
+                message: re.data.msg,
                 duration: 2000
               })
             }
@@ -462,13 +360,14 @@ export default {
       })
     },
     handleUpdate(row) {
+      this.imglists = []
       this.$r.get(this.api.info + '/' + row).then(re => {
         if (re.data.status === 'success') {
           this.dialogStatus = 'update'
           this.temp = re.data.result
           if (re.data.result.images) {
-            re.data.result.images.map(it => {
-              this.imglists.push({ name: '1', url: it })
+            re.data.result.images.split(';').map(it => {
+              this.imglists.push({ name: '1', url: this.$imgSrc + it })
             })
           }
           this.$r.get('/car_series?brand_id=' + re.data.result.brand_id).then(re => {
@@ -505,7 +404,7 @@ export default {
             } else {
               this.$notify.error({
                 title: '失败',
-                message: '修改失败',
+                message: re.data.msg,
                 duration: 2000
               })
             }
@@ -573,5 +472,28 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .avatar-uploader-icon:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    border-radius: 6px;
+    border: 1px dashed #d9d9d9;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    height: 200px;
+    display: block;
+  }
 </style>

@@ -239,17 +239,57 @@ export const asyncRouterMap = [
   //   ]
   // },
   {
-    path: '/carManage', // 汽车管理
+    path: '/notice', // 通知管理
     component: Layout,
-    zhname: '汽车管理',
-    promiss: 'carManage',
-    meta: { title: 'icons', icon: 'icon', roles: ['admin', 'carManage'] },
+    zhname: '通知管理',
+    promiss: 'notice',
+    meta: { title: 'notice', icon: 'excel', roles: ['admin', 'notice'] },
     children: [
       {
         path: 'index',
-        component: () => import('@/views/carManage/carManage'),
-        name: 'carManage',
-        meta: { title: 'icons', roles: ['admin', 'carManage'] }
+        component: () => import('@/views/notice/notice'),
+        name: 'notice',
+        meta: { title: 'notice', roles: ['admin', 'notice'] }
+      }
+    ]
+  },
+  {
+    path: '/banner', // 轮播图管理
+    component: Layout,
+    zhname: '轮播图管理',
+    promiss: 'banner',
+    meta: { title: 'banner', icon: 'guide', roles: ['admin', 'banner'] },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/banner/banner'),
+        name: 'banner',
+        meta: { title: 'banner', roles: ['admin', 'banner'] }
+      }
+    ]
+  },
+  {
+    path: '/article', // 学院课程
+    component: Layout,
+    zhname: '学院课程',
+    promiss: 'article',
+    meta: { title: 'article', icon: 'list', roles: ['admin', 'article'] },
+    children: [
+      {
+        path: 'index',
+        zhname: '学院课程',
+        promiss: 'articleindex',
+        component: () => import('@/views/article/article'),
+        name: 'articleindex',
+        meta: { title: 'article', roles: ['admin', 'articleindex'] }
+      },
+      {
+        path: 'articleSeries',
+        zhname: '课程系列',
+        promiss: 'articleSeries',
+        component: () => import('@/views/article/articleSeries'),
+        name: 'articleSeries',
+        meta: { title: 'articleSeries', roles: ['admin', 'articleSeries'] }
       }
     ]
   },
@@ -265,18 +305,25 @@ export const asyncRouterMap = [
         component: () => import('@/views/goodsManage/goodsManage'),
         name: 'goodsManage',
         meta: { title: 'goods', roles: ['admin', 'goodsManage'] }
-      }
-    ]
-  },
-  {
-    path: '/goodsCategory', // 商品分类管理
-    component: Layout,
-    zhname: '商品分类管理',
-    promiss: 'goodsCategory',
-    meta: { title: 'goodscate', icon: 'link', roles: ['admin', 'goodsCategory'] },
-    children: [
+      },
       {
-        path: 'index', // 系统分类
+        path: 'carManage', // 汽车管理
+        zhname: '汽车管理',
+        name: 'carManage',
+        component: () => import('@/views/carManage/carManage'),
+        promiss: 'carManage',
+        meta: { title: 'icons', roles: ['admin', 'carManage'] }
+      },
+      {
+        path: 'collage',
+        zhname: '拼团管理',
+        promiss: 'collage',
+        component: () => import('@/views/collage/collage'),
+        name: 'collage',
+        meta: { title: 'collage', roles: ['admin', 'collage'] }
+      },
+      {
+        path: 'goodsCategory', // 系统分类
         zhname: '系统分类',
         promiss: 'cate-index',
         component: () => import('@/views/goodsManage/goodsCategory'),
@@ -294,17 +341,17 @@ export const asyncRouterMap = [
     ]
   },
   {
-    path: '/collage', // 拼团管理
+    path: '/order', // 订单管理
     component: Layout,
-    zhname: '拼团管理',
-    promiss: 'collage',
-    meta: { title: 'collage', icon: 'component', roles: ['admin', 'collage'] },
+    zhname: '订单管理',
+    promiss: 'order',
+    meta: { title: 'order', icon: 'documentation', roles: ['admin', 'order'] },
     children: [
       {
         path: 'index',
-        component: () => import('@/views/collage/collage'),
-        name: 'collage',
-        meta: { title: 'collage', roles: ['admin', 'collage'] }
+        component: () => import('@/views/order/order'),
+        name: 'order',
+        meta: { title: 'order', roles: ['admin', 'order'] }
       }
     ]
   },
@@ -313,13 +360,13 @@ export const asyncRouterMap = [
     component: Layout,
     zhname: '会员管理',
     promiss: 'userManage',
-    meta: { title: 'banner', icon: 'peoples', roles: ['admin', 'userManage'] },
+    meta: { title: 'userManage', icon: 'peoples', roles: ['admin', 'userManage'] },
     children: [
       {
         path: 'index',
         component: () => import('@/views/userManage/userManage'),
         name: 'userManage',
-        meta: { title: 'banner', roles: ['admin', 'userManage'] }
+        meta: { title: 'userManage', roles: ['admin', 'userManage'] }
       }
     ]
   },
@@ -338,7 +385,21 @@ export const asyncRouterMap = [
       }
     ]
   },
-
+  {
+    path: '/demand', // 需求列表
+    component: Layout,
+    zhname: '需求列表',
+    promiss: 'demand',
+    meta: { title: 'demand', icon: 'tab', roles: ['admin', 'demand'] },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/Demand/Demand'),
+        name: 'demand',
+        meta: { title: 'demand', roles: ['admin', 'demand'] }
+      }
+    ]
+  },
   // {
   //   path: '/tab', // 服务指南
   //   component: Layout,

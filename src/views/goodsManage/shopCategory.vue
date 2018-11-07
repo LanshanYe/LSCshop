@@ -9,8 +9,8 @@
         <el-table-column slot="tableColumn" :label="$t('table.sort')" prop="sort" align="center"/>
         <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
           <template slot-scope="scope">
-            <el-button type="primary" size="mini" @click="handleUpdate(scope.row.base_id)">{{ $t('table.edit') }}</el-button>
-            <el-button size="mini" type="danger" @click="deleteData(scope.row.base_id)">{{ $t('table.delete') }}
+            <el-button type="primary" size="mini" @click="handleUpdate(scope.row.cate_id)">{{ $t('table.edit') }}</el-button>
+            <el-button size="mini" type="danger" @click="deleteData(scope.row.cate_id)">{{ $t('table.delete') }}
             </el-button>
           </template>
         </el-table-column>
@@ -20,34 +20,13 @@
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="120px" style="width: 100%;">
         <el-row :gutter="40">
           <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="分类类型">
-              <el-checkbox-group v-model="checkList">
-                <el-checkbox label="0">优惠采购区</el-checkbox>
-                <el-checkbox label="1">店长采购区</el-checkbox>
-                <el-checkbox label="2">品牌代理区</el-checkbox>
-              </el-checkbox-group>
+            <el-form-item label="商户ID">
+              <el-input v-model="temp.shop_id" type="text"/>
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12" :lg="8">
             <el-form-item label="分类名称">
-              <el-input v-model="temp.title" type="text"/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="分类排序" prop="body">
-              <el-input v-model="temp.sort" type="text"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="40">
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="选择上级分类" prop="category_id">
-              <el-input v-model="temp.category_id" clearable type="text"/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="上传图片" prop="shop_cate">
-              <el-input v-model="temp.shop_cate" clearable type="text"/>
+              <el-input v-model="temp.cate_name" type="text"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -99,17 +78,12 @@ export default {
       imageUrl: '',
       listLoading: true,
       imglist: [],
-      imglist2: [],
       branddata: [],
       seriesdata: [],
       listQuery: {},
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
-      temp: {
-        cover: '',
-        is_recommend: 0,
-        is_on_sale: 1
-      },
+      temp: {},
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -173,17 +147,12 @@ export default {
       this.$refs.querycomponent.handleFilter()
     },
     resetTemp() {
-      this.temp = {
-        cover: '',
-        is_recommend: 0,
-        is_on_sale: 1
-      }
+      this.temp = {}
     },
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
-      this.imglist = []
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
@@ -218,17 +187,11 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.imglist = []
       this.$r.get(this.api.info + '/' + row).then(re => {
         if (re.data.status === 'success') {
           this.dialogStatus = 'update'
           this.temp = re.data.result
           this.dialogFormVisible = true
-          if (re.data.result.images) {
-            re.data.result.images.map(it => {
-              this.imglist.push({ name: re.data.result.title, url: it })
-            })
-          }
           this.$nextTick(() => {
             this.$refs['dataForm'].clearValidate()
           })

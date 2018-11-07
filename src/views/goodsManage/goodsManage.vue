@@ -91,21 +91,10 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="封面图" prop="cover">
-          <el-upload
-            :show-file-list="false"
-            :headers="usertoken"
-            :on-success="handleAvatarSuccess"
-            :before-upload="handleAvatarbeforeupload"
-            :on-error="handleAvatarError"
-            :action="qiniuUploadUrl"
-            name="image"
-            class="avatar-uploader">
-            <img v-if="temp.cover" :src="temp.cover.indexOf('http://phi8e7fdq.bkt.clouddn.com/') >= 0?temp.cover:'http://phi8e7fdq.bkt.clouddn.com/' + temp.cover" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon"/>
-          </el-upload>
+        <el-form-item label="商品封面图" prop="cover">
+          <upimg :imgsrc="temp.cover" url="/uploadImages/goods_cover" @upSuccess="handleAvatarSuccess" @upError="handleAvatarError" @upBefore="handleAvatarbeforeupload"/>
         </el-form-item>
-        <el-form-item label="轮播图">
+        <el-form-item label="商品详情轮播图">
           <el-upload
             :headers="usertoken"
             :on-success="handleAvatarSuccess3"
@@ -115,15 +104,12 @@
             :limit="5"
             :file-list="imglist"
             accept="image"
-            action="http://lianshangche.ydxxtech.com/admin/uploadImages"
+            action="http://lianshangche.ydxxtech.com/admin/uploadImages/goods_image"
             list-type="picture-card"
             name="image">
             <i class="el-icon-plus"/>
           </el-upload>
         </el-form-item>
-        <!--<el-form-item :label="$t('table.photo')">-->
-        <!--<uploadimg ref="imgs" :imglist="imglist"/>-->
-        <!--</el-form-item>-->
       </el-form>
       <div class="filter-container">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
@@ -136,8 +122,8 @@
 
 <script>
 import query from '@/components/queryTable'
+import upimg from '@/components/Upload/uploadImg'
 import { getToken } from '@/utils/auth'
-import uploadimg from '@/components/Upload/uploadImg'
 import waves from '@/directive/waves' // 水波纹指令
 
 export default {
@@ -147,12 +133,12 @@ export default {
   },
   components: {
     query,
-    uploadimg
+    upimg
   },
   data() {
     return {
       tableKey: 0,
-      qiniuUploadUrl: 'http://lianshangche.ydxxtech.com/admin/uploadImages',
+      qiniuUploadUrl: 'http://lianshangche.ydxxtech.com/admin/uploadImages/goods_cover',
       list: null,
       addloading: false,
       editloading: false,
@@ -210,26 +196,15 @@ export default {
   },
   mounted() {
     this.$refs.querycomponent.getList()
-    this.$r.get('/car_brand').then(re => {
-      console.log(re)
-      this.branddata = re.data.result
-    })
   },
   methods: {
-    brandchange(e) {
-      this.temp.series_id = ''
-      this.$r.get('/car_series?brand_id=' + e).then(re => {
-        console.log(re)
-        this.seriesdata = re.data.result
-      })
-    },
     deleteData(id) {
       this.$confirm('您确定删除所选项?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$r.delete(this.api.delete + '/' + id).then((re) => {
+        this.$r.post(this.api.delete, { _method: 'delete', ids: id }).then((re) => {
           if (re.data.status === 'success') {
             this.$refs.querycomponent.getList()
             this.$notify({

@@ -34,11 +34,6 @@
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12" :lg="8">
-            <el-form-item label="营业执照">
-              <el-input v-model="temp.business_licence" type="text"/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :lg="8">
             <el-form-item label="店内联系电话">
               <el-input v-model="temp.shop_phone" type="text"/>
             </el-form-item>
@@ -56,34 +51,23 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="店铺LOGO">
-          <el-upload
-            :show-file-list="false"
-            :headers="usertoken"
-            :on-success="handleAvatarSuccess"
-            :before-upload="handleAvatarbeforeupload"
-            :on-error="handleAvatarError"
-            name="image"
-            action="http://lianshangche.ydxxtech.com/admin/uploadImages"
-            class="avatar-uploader">
-            <img v-if="temp.logo" :src="temp.logo.indexOf('http://phi8e7fdq.bkt.clouddn.com/') >= 0?temp.logo:'http://phi8e7fdq.bkt.clouddn.com/' + temp.logo" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon"/>
-          </el-upload>
-        </el-form-item>
-        <el-form-item label="封面图">
-          <el-upload
-            :show-file-list="false"
-            :headers="usertoken"
-            :on-success="handleAvatarSuccess2"
-            :before-upload="handleAvatarbeforeupload"
-            :on-error="handleAvatarError"
-            name="image"
-            action="http://lianshangche.ydxxtech.com/admin/uploadImages"
-            class="avatar-uploader">
-            <img v-if="temp.shop_cover" :src="temp.cover.indexOf('http://phi8e7fdq.bkt.clouddn.com/') >= 0?temp.cover:'http://phi8e7fdq.bkt.clouddn.com/' + temp.cover" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon"/>
-          </el-upload>
-        </el-form-item>
+        <el-row :gutter="40">
+          <el-col :xs="24" :sm="12" :lg="8">
+            <el-form-item label="营业执照">
+              <upimg :imgsrc="temp.business_licence" url="/uploadImages/shop_business" @upSuccess="handleAvatarSuccess5" @upError="handleAvatarError" @upBefore="handleAvatarbeforeupload"/>
+            </el-form-item>
+          </el-col>
+          <el-col :xs="24" :sm="12" :lg="8">
+            <el-form-item label="店铺LOGO">
+              <upimg :imgsrc="temp.logo" url="/uploadImages/shop_logo" @upSuccess="handleAvatarSuccess" @upError="handleAvatarError" @upBefore="handleAvatarbeforeupload"/>
+            </el-form-item>
+          </el-col>
+          <el-col :xs="24" :sm="12" :lg="8">
+            <el-form-item label="封面图">
+              <upimg :imgsrc="temp.shop_cover" url="/uploadImages/shop_cover" @upSuccess="handleAvatarSuccess2" @upError="handleAvatarError" @upBefore="handleAvatarbeforeupload"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item label="店内环境">
           <el-upload
             :headers="usertoken"
@@ -93,7 +77,7 @@
             :on-remove="handleRemove"
             :limit="5"
             :file-list="imglists"
-            action="http://lianshangche.ydxxtech.com/admin/uploadImages"
+            action="http://lianshangche.ydxxtech.com/admin/uploadImages/shop_image"
             list-type="picture-card"
             name="image">
             <i class="el-icon-plus"/>
@@ -111,6 +95,7 @@
 
 <script>
 import query from '@/components/queryTable'
+import upimg from '@/components/Upload/uploadImg'
 import { getToken } from '@/utils/auth'
 import waves from '@/directive/waves' // 水波纹指令
 
@@ -120,7 +105,8 @@ export default {
     waves
   },
   components: {
-    query
+    query,
+    upimg
   },
   data() {
     return {
@@ -150,7 +136,8 @@ export default {
       showReviewer: false,
       temp: {
         shop_cover: '',
-        logo: ''
+        logo: '',
+        business_licence: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -205,7 +192,8 @@ export default {
     resetTemp() {
       this.temp = {
         shop_cover: '',
-        logo: ''
+        logo: '',
+        business_licence: ''
       }
     },
     handleCreate() {
@@ -252,8 +240,8 @@ export default {
           this.dialogStatus = 'update'
           this.temp = re.data.result
           if (re.data.result.shop_images) {
-            re.data.result.shop_images.split(';').map(it => {
-              this.imglists.push({ name: '1', url: it })
+            re.data.result.shop_images.map(it => {
+              this.imglists.push({ name: '1', url: this.$imgSrc + it })
             })
           }
           this.dialogFormVisible = true
@@ -323,16 +311,21 @@ export default {
       })
       this.temp.shop_images = imgs.join(';')
     },
-    handleAvatarSuccess(res, file) {
-      console.log(res)
+    handleAvatarSuccess5(res) {
+      if (res.status === 'success') {
+        this.temp.business_licence = res.msg
+      }
+      this.editloading = false
+      this.addloading = false
+    },
+    handleAvatarSuccess(res) {
       if (res.status === 'success') {
         this.temp.logo = res.msg
       }
       this.editloading = false
       this.addloading = false
     },
-    handleAvatarSuccess2(res, file) {
-      console.log(res)
+    handleAvatarSuccess2(res) {
       if (res.status === 'success') {
         this.temp.shop_cover = res.msg
       }
@@ -340,7 +333,6 @@ export default {
       this.addloading = false
     },
     handleAvatarSuccess3(res, file, filelist) {
-      console.log(res)
       var imgs = []
       filelist.map(it => {
         if (it.response.status === 'success') {
@@ -364,27 +356,4 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-  .avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
-  .avatar-uploader .el-upload:hover {
-    border-color: #409EFF;
-  }
-  .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    line-height: 178px;
-    text-align: center;
-  }
-  .avatar {
-    width: 178px;
-    height: 178px;
-    display: block;
-  }
 </style>

@@ -6,41 +6,30 @@
           <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
           <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
         </div>
-        <el-table-column slot="tableColumn" :label="$t('table.photo')" width="200px" prop="iamge" align="center">
-          <template slot-scope="scope">
-            <img :src="scope.row.image" style="max-width:100%" alt="">
-          </template>
-        </el-table-column>
-        <el-table-column slot="tableColumn" :label="$t('table.description')" prop="name" align="center"/>
+        <el-table-column slot="tableColumn" label="系列名称" prop="title" align="center"/>
         <el-table-column slot="tableColumn" :label="$t('table.sort')" prop="sort" align="center"/>
         <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
           <template slot-scope="scope">
-            <el-button type="primary" size="mini" @click="handleUpdate(scope.row.banner_id)">{{ $t('table.edit') }}</el-button>
-            <el-button size="mini" type="danger" @click="deleteData(scope.row.banner_id)">{{ $t('table.delete') }}</el-button>
+            <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
+            <el-button size="mini" type="danger" @click="deleteData(scope.row.series_id)">{{ $t('table.delete') }}</el-button>
           </template>
         </el-table-column>
       </query>
     </div>
     <div v-show="dialogFormVisible" class="app-container">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="120px" style="width: 100%;">
-        <el-form-item label="轮播图名称">
-          <el-input v-model="temp.name" type="text"/>
-        </el-form-item>
-        <el-form-item label="跳转类型">
-          <el-radio v-model="temp.type" label="url" border>链接地址</el-radio>
-          <el-radio v-model="temp.type" label="shop_id" border>商铺id</el-radio>
-          <el-radio v-model="temp.type" label="goods_id" border>商品id</el-radio>
-          <el-radio v-model="temp.type" label="article_id" border>文章id</el-radio>
-        </el-form-item>
-        <el-form-item label="跳转地址或ID">
-          <el-input v-model="temp.target" type="text"/>
-        </el-form-item>
-        <el-form-item :label="$t('table.sort')">
-          <el-input v-model="temp.sort" placeholder="数字越大越在前"/>
-        </el-form-item>
-        <el-form-item label="封面图">
-          <upimg :imgsrc="temp.image" url="/uploadImages/banner" @upSuccess="handleAvatarSuccess" @upError="handleAvatarError" @upBefore="handleAvatarbeforeupload"/>
-        </el-form-item>
+        <el-row :gutter="40">
+          <el-col :xs="24" :sm="12" :lg="8">
+            <el-form-item label="系列名称">
+              <el-input v-model="temp.title" type="text"/>
+            </el-form-item>
+          </el-col>
+          <el-col :xs="24" :sm="12" :lg="8">
+            <el-form-item :label="$t('table.sort')">
+              <el-input v-model="temp.sort" placeholder="数字越大越在前"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div class="filter-container">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
@@ -57,7 +46,7 @@ import upimg from '@/components/Upload/uploadImg'
 import waves from '@/directive/waves' // 水波纹指令
 
 export default {
-  name: 'Banner',
+  name: 'Article',
   directives: {
     waves
   },
@@ -71,11 +60,11 @@ export default {
       list: null,
       imglist: [],
       api: {
-        add: '/banner',
-        edit: '/banner',
-        fetch: '/banner',
-        info: '/banner',
-        delete: '/banner'
+        add: '/article-series',
+        edit: '/article-series',
+        fetch: '/article-series',
+        info: '/article-series',
+        delete: '/article-series'
       },
       addloading: false,
       editloading: false,
@@ -185,22 +174,26 @@ export default {
         }
       })
     },
+    // handleUpdate(row) {
+    //   this.$r.get(this.api.info + '/' + row).then(re => {
+    //     if (re.data.status === 'success') {
+    //       this.dialogStatus = 'update'
+    //       this.temp = re.data.result
+    //       this.dialogFormVisible = true
+    //       this.$nextTick(() => {
+    //         this.$refs['dataForm'].clearValidate()
+    //       })
+    //     } else {
+    //       this.$notify.error({
+    //         title: '失败',
+    //         message: re.data.msg || '获取失败'
+    //       })
+    //     }
+    //   }).catch(errs => console.log(errs))
+    // },
     handleUpdate(row) {
-      this.$r.get(this.api.info + '/' + row).then(re => {
-        if (re.data.status === 'success') {
-          this.dialogStatus = 'update'
-          this.temp = re.data.result
-          this.dialogFormVisible = true
-          this.$nextTick(() => {
-            this.$refs['dataForm'].clearValidate()
-          })
-        } else {
-          this.$notify.error({
-            title: '失败',
-            message: re.data.msg || '获取失败'
-          })
-        }
-      }).catch(errs => console.log(errs))
+      this.temp = row
+      this.dialogFormVisible = true
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {

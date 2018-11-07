@@ -18,7 +18,11 @@
         <el-table-column slot="tableColumn" label="库存" prop="collage_inventory" align="center"/>
         <el-table-column slot="tableColumn" label="商户ID" prop="shop_id" align="center"/>
         <el-table-column slot="tableColumn" label="期数" prop="periods" align="center"/>
-        <el-table-column slot="tableColumn" label="状态" prop="status" align="center"/>
+        <el-table-column slot="tableColumn" label="状态" prop="status" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.status===1?'上架':'下架' }}</span>
+          </template>
+        </el-table-column>
         <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
           <template slot-scope="scope">
             <el-button type="primary" size="mini" @click="handleUpdate(scope.row.id)">{{ $t('table.edit') }}</el-button>
@@ -145,7 +149,7 @@ export default {
       },
       imglists: [],
       total: null,
-      value4: '',
+      value4: [],
       listLoading: true,
       imglist: [],
       branddata: [],
@@ -208,6 +212,7 @@ export default {
       this.$refs.querycomponent.handleFilter()
     },
     resetTemp() {
+      this.value4 = []
       this.temp = {
         shop_cover: '',
         logo: ''
@@ -261,6 +266,7 @@ export default {
               this.imglists.push({ name: '1', url: it })
             })
           }
+          this.value4 = [re.data.result.start_time * 1000, re.data.result.end_time * 1000]
           this.dialogFormVisible = true
           this.$nextTick(() => {
             this.$refs['dataForm'].clearValidate()

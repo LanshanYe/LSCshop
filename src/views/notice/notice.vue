@@ -3,15 +3,24 @@
     <div v-show="!dialogFormVisible">
       <query ref="querycomponent" :list-query="listQuery" :api="api">
         <div slot="queryFilter">
+          <el-radio-group v-model="listQuery.type" class="filter-item" size="small" @change="typechange">
+            <el-radio-button :label="1">公司动态</el-radio-button>
+            <el-radio-button :label="2">权威发布</el-radio-button>
+          </el-radio-group>
           <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.add') }}</el-button>
           <el-button v-waves class="filter-item" size="small" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
         </div>
-        <el-table-column slot="tableColumn" :label="$t('table.photo')" width="200px" prop="iamge" align="center">
+        <el-table-column slot="tableColumn" :label="$t('table.photo')" width="200px" prop="cover" align="center">
           <template slot-scope="scope">
-            <img :src="scope.row.image" style="max-width:100%" alt="">
+            <img :src="scope.row.cover" style="max-width:100%" alt="">
           </template>
         </el-table-column>
-        <el-table-column slot="tableColumn" :label="$t('table.description')" prop="name" align="center"/>
+        <el-table-column slot="tableColumn" label="标题" prop="title" align="center"/>
+        <el-table-column slot="tableColumn" label="内容" prop="name" align="center">
+          <template slot-scope="scope">
+            <div style="max-width: 400px;max-height: 200px;overflow: auto" v-html="scope.row.content"/>
+          </template>
+        </el-table-column>
         <el-table-column slot="tableColumn" :label="$t('table.sort')" prop="sort" align="center"/>
         <el-table-column slot="tableColumn" :label="$t('table.actions')" align="center" width="230" class-name="small-padding fixed-width">
           <template slot-scope="scope">
@@ -23,23 +32,21 @@
     </div>
     <div v-show="dialogFormVisible" class="app-container">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="120px" style="width: 100%;">
-        <el-form-item label="轮播图名称">
-          <el-input v-model="temp.name" type="text"/>
+        <el-form-item label="公告名称">
+          <el-input v-model="temp.title" type="text"/>
         </el-form-item>
-        <el-form-item label="跳转类型">
-          <el-radio v-model="temp.type" label="url" border>链接地址</el-radio>
-          <el-radio v-model="temp.type" label="shop_id" border>商铺id</el-radio>
-          <el-radio v-model="temp.type" label="goods_id" border>商品id</el-radio>
-          <el-radio v-model="temp.type" label="article_id" border>文章id</el-radio>
-        </el-form-item>
-        <el-form-item label="跳转地址或ID">
-          <el-input v-model="temp.target" type="text"/>
+        <el-form-item label="类型">
+          <el-radio v-model="temp.type" :label="1" border>公司动态</el-radio>
+          <el-radio v-model="temp.type" :label="2" border>权威发布</el-radio>
         </el-form-item>
         <el-form-item :label="$t('table.sort')">
           <el-input v-model="temp.sort" placeholder="数字越大越在前"/>
         </el-form-item>
         <el-form-item label="封面图">
-          <upimg :imgsrc="temp.image" url="/uploadImages/banner" @upSuccess="handleAvatarSuccess" @upError="handleAvatarError" @upBefore="handleAvatarbeforeupload"/>
+          <upimg :imgsrc="temp.cover" url="/uploadImages/banner" @upSuccess="handleAvatarSuccess" @upError="handleAvatarError" @upBefore="handleAvatarbeforeupload"/>
+        </el-form-item>
+        <el-form-item label="公告内容">
+          <tinymce ref="tiny" :height="400" v-model="temp.content"/>
         </el-form-item>
       </el-form>
       <div class="filter-container">
@@ -54,16 +61,18 @@
 <script>
 import query from '@/components/queryTable'
 import upimg from '@/components/Upload/uploadImg'
+import Tinymce from '@/components/Tinymce'
 import waves from '@/directive/waves' // 水波纹指令
 
 export default {
-  name: 'Banner',
+  name: 'Article',
   directives: {
     waves
   },
   components: {
     query,
-    upimg
+    upimg,
+    Tinymce
   },
   data() {
     return {
@@ -71,23 +80,25 @@ export default {
       list: null,
       imglist: [],
       api: {
-        add: '/banner',
-        edit: '/banner',
-        fetch: '/banner',
-        info: '/banner',
-        delete: '/banner'
+        add: '/notice',
+        edit: '/notice',
+        fetch: '/notice',
+        info: '/notice',
+        delete: '/notice'
       },
       addloading: false,
       editloading: false,
       total: null,
       value4: '',
       listLoading: false,
-      listQuery: {},
+      listQuery: {
+        type: 1
+      },
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
-        image: '',
-        is_mobile: 1
+        cover: '',
+        type: 1
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -141,14 +152,14 @@ export default {
     },
     resetTemp() {
       this.temp = {
-        image: '',
-        is_mobile: 1
+        cover: '',
+        type: 1
       }
     },
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'
-      this.imglist = []
+      this.$refs.tiny.setContent('')
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
@@ -190,6 +201,7 @@ export default {
         if (re.data.status === 'success') {
           this.dialogStatus = 'update'
           this.temp = re.data.result
+          this.$refs.tiny.setContent(re.data.result.content || '')
           this.dialogFormVisible = true
           this.$nextTick(() => {
             this.$refs['dataForm'].clearValidate()
@@ -248,7 +260,7 @@ export default {
     handleAvatarSuccess(res, file) {
       console.log(res)
       if (res.status === 'success') {
-        this.temp.image = res.msg
+        this.temp.cover = res.msg
       }
       this.editloading = false
       this.addloading = false

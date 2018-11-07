@@ -21,6 +21,7 @@ import './permission' // permission control
 import * as filters from './filters' // global filters
 
 Vue.prototype.$r = request
+Vue.prototype.$imgSrc = 'http://phi8e7fdq.bkt.clouddn.com/'
 
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium', // set element-ui default size
